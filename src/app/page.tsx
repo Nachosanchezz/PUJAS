@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-24 text-center">
@@ -13,6 +15,10 @@ export default function HomePage() {
         Cinco equipos, un presupuesto limitado y pujas en directo desde el
         móvil.
       </p>
+
+      <Link href="/admin" className="text-sm text-foreground/50 hover:text-foreground">
+        Acceso administrador
+      </Link>
     </main>
   );
 }

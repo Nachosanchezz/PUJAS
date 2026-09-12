@@ -13,7 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Subasta Liga Fútbol Sala",
+  title: {
+    default: "Subasta Liga Fútbol Sala",
+    template: "%s · Subasta Liga Fútbol Sala",
+  },
   description: "Subasta en directo de jugadores para la liga de fútbol sala",
 };
 

@@ -24,6 +24,7 @@ erDiagram
     int squad_size_max "8"
     int squad_size_min "7"
     int teams_at_max "3"
+    int max_teams "5"
     int auction_seconds "15"
     int anti_snipe_seconds "5"
   }
@@ -103,4 +104,5 @@ La vista `team_standings` calcula todo esto en la base de datos.
 - **El presupuesto restante no se guarda: se calcula** (inicial − suma de lo pagado). Así, si el administrador corrige una adjudicación, el presupuesto se ajusta solo y nunca puede quedar descuadrado.
 - **El contador se guarda como hora de fin (`ends_at`)**, no como "segundos restantes". Cada móvil calcula el tiempo a partir de esa hora, y el cierre lo valida el servidor.
 - **Las reglas viven en la base de datos** (restricciones `check`, índices únicos, claves foráneas). Aunque alguien manipule el navegador, PostgreSQL rechaza los datos imposibles: un jugador vendido sin equipo, dos subastas abiertas a la vez, dos capitanes en un equipo…
+- **Equipo y capitán se crean juntos** con la función SQL `create_team`: o se crean los dos o ninguno, y respeta el límite de equipos (`max_teams`) aunque dos altas lleguen a la vez.
 - **RLS activado en todas las tablas.** Con la clave pública de Supabase nadie puede leer ni escribir nada hasta que definamos permisos concretos.

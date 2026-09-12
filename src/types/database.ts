@@ -203,6 +203,7 @@ export type Database = {
           created_at: string
           id: string
           initial_budget: number
+          max_teams: number
           min_price: number
           name: string
           squad_size_max: number
@@ -217,6 +218,7 @@ export type Database = {
           created_at?: string
           id?: string
           initial_budget?: number
+          max_teams?: number
           min_price?: number
           name: string
           squad_size_max?: number
@@ -231,6 +233,7 @@ export type Database = {
           created_at?: string
           id?: string
           initial_budget?: number
+          max_teams?: number
           min_price?: number
           name?: string
           squad_size_max?: number
@@ -299,7 +302,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      create_team: {
+        Args: { p_captain_name: string; p_name: string; p_room_id: string }
+        Returns: string
+      }
     }
     Enums: {
       auction_status: "running" | "paused" | "sold" | "unsold" | "cancelled"
