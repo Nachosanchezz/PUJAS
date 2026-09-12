@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   createPlayer,
@@ -12,6 +13,7 @@ import { ActionForm } from "@/components/action-form";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { PlayerImport } from "@/components/admin/player-import";
 import { CopyButton } from "@/components/ui/copy-button";
+import { SectionTitle } from "@/components/ui/section-title";
 import { TextField } from "@/components/ui/text-field";
 import { requireAdmin } from "@/lib/admin-auth";
 import { formatMillions } from "@/lib/format";
@@ -88,6 +90,14 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
           Cada presidente elige su equipo y entra con el PIN de su tarjeta.
         </span>
       </div>
+
+      <Link
+        href={`/admin/rooms/${room.code}/live`}
+        className="flex items-center justify-between rounded-xl bg-emerald-500 px-4 py-3 font-semibold text-black transition-colors hover:bg-emerald-400"
+      >
+        Abrir sala de control
+        <span aria-hidden>→</span>
+      </Link>
 
       <section className="flex flex-col gap-4">
         <SectionTitle title="Equipos" count={`${teams.length}/${room.max_teams}`} />
@@ -220,14 +230,5 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
         )}
       </section>
     </main>
-  );
-}
-
-function SectionTitle({ title, count }: { title: string; count: string }) {
-  return (
-    <div className="flex items-baseline justify-between">
-      <h2 className="text-xl font-semibold">{title}</h2>
-      <span className="text-sm text-foreground/60">{count}</span>
-    </div>
   );
 }

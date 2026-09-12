@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { leaveRoom } from "@/app/room/actions";
+import { AuctionCard } from "@/components/auction/auction-card";
+import { AutoRefresh } from "@/components/auto-refresh";
 import { JoinForm } from "@/components/room/join-form";
 import { StandingsList } from "@/components/room/standings-list";
 import { formatMillions } from "@/lib/format";
 import { getPresidentSession } from "@/lib/president-auth";
-import { getTeamSummaries } from "@/lib/room-data";
+import { getOpenAuction, getTeamSummaries } from "@/lib/room-data";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const metadata: Metadata = {
   title: "Sala",
 };
+
+const WAITING_MESSAGE = {
+  setup: "La subasta todavía no ha empezado. Deja esta página abierta.",
+  live: "Esperando al siguiente jugador…",
+  finished: "La subasta ha terminado.",
+} as const;
 
 export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
   const { code } = await params;
@@ -18,16 +26,17 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
   // Página pública: solo pedimos columnas que puede ver cualquiera
   const { data: room, error } = await supabaseAdmin
     .from("rooms")
-    .select("id, code, name")
+    .select("id, code, name, status")
     .eq("code", code.toUpperCase())
     .maybeSingle();
 
   if (error) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const [session, teams] = await Promise.all([
+  const [session, teams, auction] = await Promise.all([
     getPresidentSession(room.id),
     getTeamSummaries(room.id),
+    getOpenAuction(room.id),
   ]);
 
   const heading = (
@@ -56,7 +65,16 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-6 py-12">
+      <AutoRefresh />
       {heading}
+
+      {auction ? (
+        <AuctionCard auction={auction} />
+      ) : (
+        <p className="rounded-xl border border-foreground/10 p-4 text-center text-foreground/70">
+          {WAITING_MESSAGE[room.status]}
+        </p>
+      )}
 
       <section className="flex flex-col gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
         <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
@@ -82,10 +100,6 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
           </dl>
         )}
       </section>
-
-      <p className="rounded-xl border border-foreground/10 p-4 text-center text-foreground/70">
-        La subasta todavía no ha empezado. Deja esta página abierta.
-      </p>
 
       <section className="flex flex-col gap-3">
         <h3 className="font-semibold">Equipos</h3>

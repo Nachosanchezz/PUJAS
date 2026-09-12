@@ -1,5 +1,6 @@
 import "server-only";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import type { Enums } from "@/types/database";
 
 export type TeamSummary = {
   id: string;
@@ -38,4 +39,47 @@ export async function getTeamSummaries(roomId: string): Promise<TeamSummary[]> {
     remaining: team.remaining ?? 0,
     maxBid: team.max_bid ?? 0,
   }));
+}
+
+export type AuctionView = {
+  id: string;
+  status: Enums<"auction_status">;
+  playerName: string;
+  playerPosition: string | null;
+  startingPrice: number;
+  currentPrice: number | null;
+  leadingTeamName: string | null;
+  endsAt: string | null;
+  pausedRemainingMs: number | null;
+  // Hora del servidor al generar la página: el contador la usa para
+  // corregir la hora del dispositivo si está mal puesta
+  serverNow: string;
+};
+
+// El jugador que está ahora mismo en subasta (en marcha o en pausa), si lo hay
+export async function getOpenAuction(roomId: string): Promise<AuctionView | null> {
+  const { data, error } = await supabaseAdmin
+    .from("auctions")
+    .select(
+      "id, status, starting_price, current_price, ends_at, paused_remaining_ms, player:players(name, position), leading_team:teams(name)",
+    )
+    .eq("room_id", roomId)
+    .in("status", ["running", "paused"])
+    .maybeSingle();
+
+  if (error) throw new Error("No se pudo cargar la subasta");
+  if (!data?.player) return null;
+
+  return {
+    id: data.id,
+    status: data.status,
+    playerName: data.player.name,
+    playerPosition: data.player.position,
+    startingPrice: data.starting_price,
+    currentPrice: data.current_price,
+    leadingTeamName: data.leading_team?.name ?? null,
+    endsAt: data.ends_at,
+    pausedRemainingMs: data.paused_remaining_ms,
+    serverNow: new Date().toISOString(),
+  };
 }

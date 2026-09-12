@@ -101,6 +101,17 @@ Cada plaza que quede libre después de esta puja reserva el precio mínimo, para
 
 La vista `team_standings` calcula todo esto en la base de datos.
 
+## Ciclo de una subasta
+
+```
+start_auction    jugador disponible  ->  subasta 'running' (ends_at = ahora + 15 s)
+pause_auction    'running'           ->  'paused'  (guarda los ms que quedaban)
+resume_auction   'paused'            ->  'running' (ends_at = ahora + lo que quedaba)
+cancel_auction   'running'/'paused'  ->  'cancelled' y el jugador vuelve a la lista
+```
+
+Solo puede haber una subasta abierta por sala. La primera que se abre pasa la sala de `setup` a `live`, y a partir de ahí no se pueden añadir equipos.
+
 ## Decisiones de diseño
 
 - **El presupuesto restante no se guarda: se calcula** (inicial − suma de lo pagado). Así, si el administrador corrige una adjudicación, el presupuesto se ajusta solo y nunca puede quedar descuadrado.
