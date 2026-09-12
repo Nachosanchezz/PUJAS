@@ -25,10 +25,20 @@ Aplicación web para organizar el draft de una liga de fútbol sala mediante una
 
 ```bash
 npm install
+cp .env.example .env.local   # y rellena los valores de Supabase
 npm run dev
 ```
 
-Abre [http://localhost:3100](http://localhost:3100).
+Abre [http://localhost:3100](http://localhost:3100). En [/status](http://localhost:3100/status) puedes comprobar la conexión con la base de datos.
+
+### Base de datos
+
+El proyecto de Supabase se enlaza una vez con `npx supabase login` y `npx supabase link --project-ref <ref>`. Después:
+
+```bash
+npm run db:push    # aplica las migraciones pendientes de supabase/migrations/
+npm run db:types   # regenera src/types/database.ts a partir del esquema
+```
 
 ## Scripts
 
@@ -39,11 +49,15 @@ Abre [http://localhost:3100](http://localhost:3100).
 | `npm run start` | Sirve la versión compilada |
 | `npm run lint` | Revisa el código con ESLint |
 | `npm run typecheck` | Genera los tipos de rutas y comprueba TypeScript |
+| `npm run db:push` | Aplica las migraciones en Supabase |
+| `npm run db:types` | Genera los tipos de TypeScript de la base de datos |
 
 ## Estructura
 
 ```
 src/app/               Rutas de la aplicación (App Router)
+src/lib/               Cliente de Supabase y utilidades
+src/types/             Tipos generados de la base de datos
 supabase/migrations/   Esquema de la base de datos (SQL)
 docs/                  Documentación (modelo de datos y reglas)
 ```
