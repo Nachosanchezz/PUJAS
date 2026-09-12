@@ -43,5 +43,11 @@ Abre [http://localhost:3100](http://localhost:3100).
 ## Estructura
 
 ```
-src/app/        Rutas de la aplicación (App Router)
+src/app/               Rutas de la aplicación (App Router)
+supabase/migrations/   Esquema de la base de datos (SQL)
+docs/                  Documentación (modelo de datos y reglas)
 ```
+
+## Reglas de la liga
+
+5 equipos y 38 jugadores (5 capitanes + 33 en subasta). Tres equipos acaban con 8 jugadores y dos con 7. Todos los jugadores salen a 1 M€, y la puja máxima reserva 1 M€ por cada plaza que quede por cubrir. Detalle completo en [docs/modelo-de-datos.md](docs/modelo-de-datos.md).
