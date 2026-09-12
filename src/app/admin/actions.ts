@@ -7,12 +7,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { FormState } from "@/components/action-form";
+import type { ImportState } from "@/components/admin/player-import";
 import {
   endAdminSession,
   isValidAdminPassword,
   requireAdmin,
   startAdminSession,
 } from "@/lib/admin-auth";
+import { normalizeName, parsePlayerList } from "@/lib/player-list";
 import { generateRoomCode } from "@/lib/room-code";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
@@ -160,6 +162,64 @@ export async function createPlayer(_state: FormState, formData: FormData): Promi
 
   revalidatePath(ROOM_PAGE, "page");
   return { error: null };
+}
+
+const MAX_IMPORT = 200;
+
+const importSchema = z.object({
+  roomId: z.uuid(),
+  list: z.string().max(20000, "La lista es demasiado larga"),
+});
+
+export async function importPlayers(_state: ImportState, formData: FormData): Promise<ImportState> {
+  await requireAdmin();
+
+  const parsed = importSchema.safeParse({
+    roomId: formData.get("roomId"),
+    list: formData.get("list") ?? "",
+  });
+  if (!parsed.success) return { error: firstIssue(parsed.error), message: null };
+
+  // El servidor vuelve a interpretar la lista: nunca se fía de la vista previa
+  const { players } = parsePlayerList(parsed.data.list);
+  if (players.length === 0) return { error: "No hay ningún jugador en la lista", message: null };
+  if (players.length > MAX_IMPORT) {
+    return { error: `Máximo ${MAX_IMPORT} jugadores por importación`, message: null };
+  }
+
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from("players")
+    .select("name")
+    .eq("room_id", parsed.data.roomId);
+  if (existingError) return { error: "No se pudo leer la sala", message: null };
+
+  const existingNames = new Set(existing.map((player) => normalizeName(player.name)));
+  const fresh = players.filter((player) => !existingNames.has(normalizeName(player.name)));
+  const skipped = players.length - fresh.length;
+
+  if (fresh.length === 0) {
+    return { error: "Todos los jugadores de la lista ya están en la sala", message: null };
+  }
+
+  // Un solo insert con todas las filas: o entran todos o ninguno
+  const { error } = await supabaseAdmin.from("players").insert(
+    fresh.map((player) => ({
+      room_id: parsed.data.roomId,
+      name: player.name,
+      position: player.position,
+    })),
+  );
+
+  if (error) {
+    if (error.code === UNIQUE_VIOLATION) {
+      return { error: "Algún jugador ya existe en la sala. Recarga la página y vuelve a intentarlo", message: null };
+    }
+    return { error: "No se pudieron importar los jugadores", message: null };
+  }
+
+  revalidatePath(ROOM_PAGE, "page");
+  const note = skipped > 0 ? ` (${skipped} ya estaban en la sala)` : "";
+  return { error: null, message: `Importados ${fresh.length} jugadores${note}` };
 }
 
 export async function deletePlayer(formData: FormData): Promise<void> {

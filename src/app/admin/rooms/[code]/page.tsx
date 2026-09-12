@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createPlayer, createTeam, deletePlayer } from "@/app/admin/actions";
+import { createPlayer, createTeam, deletePlayer, importPlayers } from "@/app/admin/actions";
 import { ActionForm } from "@/components/action-form";
 import { AdminHeader } from "@/components/admin/admin-header";
+import { PlayerImport } from "@/components/admin/player-import";
 import { TextField } from "@/components/ui/text-field";
 import { requireAdmin } from "@/lib/admin-auth";
 import { formatMillions } from "@/lib/format";
@@ -111,6 +112,14 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
       <section className="flex flex-col gap-4">
         <SectionTitle title="Jugadores en subasta" count={String(auctionPlayers.length)} />
 
+        <h3 className="font-semibold text-foreground/80">Importar lista</h3>
+        <PlayerImport
+          roomId={room.id}
+          existingNames={players.data.map((player) => player.name)}
+          action={importPlayers}
+        />
+
+        <h3 className="mt-4 font-semibold text-foreground/80">Añadir uno a uno</h3>
         <ActionForm action={createPlayer} submitLabel="Añadir jugador">
           <input type="hidden" name="roomId" value={room.id} />
           <div className="grid gap-3 sm:grid-cols-2">
