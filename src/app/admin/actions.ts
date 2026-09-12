@@ -14,20 +14,13 @@ import {
   requireAdmin,
   startAdminSession,
 } from "@/lib/admin-auth";
+import { generatePin } from "@/lib/pin";
 import { normalizeName, parsePlayerList } from "@/lib/player-list";
 import { generateRoomCode } from "@/lib/room-code";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { firstIssue, RAISED_EXCEPTION, UNIQUE_VIOLATION } from "@/lib/validation";
 
 const ROOM_PAGE = "/admin/rooms/[code]";
-
-// Código de error de PostgreSQL para un valor duplicado (restricción unique)
-const UNIQUE_VIOLATION = "23505";
-// Código de los errores que lanzamos con `raise exception` en nuestras funciones SQL
-const RAISED_EXCEPTION = "P0001";
-
-function firstIssue(error: z.ZodError): string {
-  return error.issues[0]?.message ?? "Datos no válidos";
-}
 
 // ---------- Sesión ----------
 
@@ -111,6 +104,7 @@ export async function createTeam(_state: FormState, formData: FormData): Promise
     p_room_id: parsed.data.roomId,
     p_name: parsed.data.name,
     p_captain_name: parsed.data.captainName,
+    p_pin: generatePin(),
   });
 
   if (error) {
@@ -123,6 +117,23 @@ export async function createTeam(_state: FormState, formData: FormData): Promise
 
   revalidatePath(ROOM_PAGE, "page");
   return { error: null };
+}
+
+export async function regenerateTeamPin(formData: FormData): Promise<void> {
+  await requireAdmin();
+
+  const parsed = z.uuid().safeParse(formData.get("teamId"));
+  if (!parsed.success) return;
+
+  // Un PIN nuevo también cierra la sesión de quien entró con el anterior
+  await supabaseAdmin.from("team_access").upsert({
+    team_id: parsed.data,
+    pin: generatePin(),
+    failed_attempts: 0,
+    locked_until: null,
+  });
+
+  revalidatePath(ROOM_PAGE, "page");
 }
 
 // ---------- Jugadores ----------

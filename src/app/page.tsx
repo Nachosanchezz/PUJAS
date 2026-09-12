@@ -1,3 +1,4 @@
+import Form from "next/form";
 import Link from "next/link";
 
 export default function HomePage() {
@@ -15,6 +16,24 @@ export default function HomePage() {
         Cinco equipos, un presupuesto limitado y pujas en directo desde el
         móvil.
       </p>
+
+      <Form action="/room" className="flex w-full max-w-xs gap-2">
+        <input
+          name="code"
+          required
+          maxLength={6}
+          placeholder="Código de sala"
+          aria-label="Código de sala"
+          autoComplete="off"
+          className="min-w-0 flex-1 rounded-lg border border-foreground/15 bg-transparent px-3 py-2 text-center font-mono text-base uppercase tracking-widest outline-none focus:border-emerald-500"
+        />
+        <button
+          type="submit"
+          className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-black transition-colors hover:bg-emerald-400"
+        >
+          Entrar
+        </button>
+      </Form>
 
       <Link href="/admin" className="text-sm text-foreground/50 hover:text-foreground">
         Acceso administrador

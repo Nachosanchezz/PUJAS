@@ -243,6 +243,42 @@ export type Database = {
         }
         Relationships: []
       }
+      team_access: {
+        Row: {
+          failed_attempts: number
+          locked_until: string | null
+          pin: string
+          team_id: string
+        }
+        Insert: {
+          failed_attempts?: number
+          locked_until?: string | null
+          pin: string
+          team_id: string
+        }
+        Update: {
+          failed_attempts?: number
+          locked_until?: string | null
+          pin?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_access_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "team_standings"
+            referencedColumns: ["team_id"]
+          },
+          {
+            foreignKeyName: "team_access_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       teams: {
         Row: {
           created_at: string
@@ -303,7 +339,16 @@ export type Database = {
     }
     Functions: {
       create_team: {
-        Args: { p_captain_name: string; p_name: string; p_room_id: string }
+        Args: {
+          p_captain_name: string
+          p_name: string
+          p_pin: string
+          p_room_id: string
+        }
+        Returns: string
+      }
+      verify_team_pin: {
+        Args: { p_pin: string; p_team_id: string }
         Returns: string
       }
     }

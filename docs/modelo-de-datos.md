@@ -14,6 +14,7 @@ erDiagram
   auctions ||--o{ bids : "recibe"
   teams ||--o{ bids : "hace"
   teams |o--o{ auctions : "va ganando"
+  teams ||--|| team_access : "PIN"
 
   rooms {
     uuid id PK
@@ -72,6 +73,7 @@ erDiagram
 | `players` | Los 38 jugadores: los 5 capitanes (ya asignados a su equipo, precio 0) y los 33 que salen a subasta. |
 | `auctions` | Cada vez que un jugador sale a subasta. Guarda la puja más alta, quién la tiene y a qué hora termina. |
 | `bids` | Todas las pujas, en orden. Es el historial. |
+| `team_access` | El PIN de 4 cifras de cada equipo y el contador de intentos fallidos. Tabla privada: solo la lee el servidor. |
 
 Un jugador puede tener varias `auctions`: si se cancela o nadie puja, vuelve a la lista y puede salir otra vez.
 
@@ -105,4 +107,5 @@ La vista `team_standings` calcula todo esto en la base de datos.
 - **El contador se guarda como hora de fin (`ends_at`)**, no como "segundos restantes". Cada móvil calcula el tiempo a partir de esa hora, y el cierre lo valida el servidor.
 - **Las reglas viven en la base de datos** (restricciones `check`, índices únicos, claves foráneas). Aunque alguien manipule el navegador, PostgreSQL rechaza los datos imposibles: un jugador vendido sin equipo, dos subastas abiertas a la vez, dos capitanes en un equipo…
 - **Equipo y capitán se crean juntos** con la función SQL `create_team`: o se crean los dos o ninguno, y respeta el límite de equipos (`max_teams`) aunque dos altas lleguen a la vez.
+- **PIN por equipo con bloqueo**: la función `verify_team_pin` bloquea el equipo 5 minutos tras 5 fallos seguidos, para que nadie pueda probar las 10.000 combinaciones.
 - **RLS activado en todas las tablas.** Con la clave pública de Supabase nadie puede leer ni escribir nada hasta que definamos permisos concretos.

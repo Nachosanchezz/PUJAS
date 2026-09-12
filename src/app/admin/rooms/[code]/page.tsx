@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { createPlayer, createTeam, deletePlayer, importPlayers } from "@/app/admin/actions";
+import {
+  createPlayer,
+  createTeam,
+  deletePlayer,
+  importPlayers,
+  regenerateTeamPin,
+} from "@/app/admin/actions";
 import { ActionForm } from "@/components/action-form";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { PlayerImport } from "@/components/admin/player-import";
+import { CopyButton } from "@/components/ui/copy-button";
 import { TextField } from "@/components/ui/text-field";
 import { requireAdmin } from "@/lib/admin-auth";
 import { formatMillions } from "@/lib/format";
@@ -29,18 +37,28 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
   if (roomError) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const [standings, players] = await Promise.all([
+  const [standings, players, access, requestHeaders] = await Promise.all([
     supabaseAdmin.from("team_standings").select("*").eq("room_id", room.id).order("name"),
     supabaseAdmin
       .from("players")
       .select("id, name, position, status, is_captain, team_id, sold_price")
       .eq("room_id", room.id)
       .order("name"),
+    supabaseAdmin
+      .from("team_access")
+      .select("team_id, pin, teams!inner(room_id)")
+      .eq("teams.room_id", room.id),
+    headers(),
   ]);
 
-  if (standings.error || players.error) {
+  if (standings.error || players.error || access.error) {
     throw new Error("No se pudieron cargar los datos de la sala");
   }
+
+  const pins = new Map<string | null, string>(access.data.map((row) => [row.team_id, row.pin]));
+  // El enlace usa el mismo dominio desde el que abres el panel (localhost, la IP de tu red o Vercel)
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
+  const roomUrl = `${protocol}://${requestHeaders.get("host")}/room/${room.code}`;
 
   const teams = standings.data;
   const teamNames = new Map(teams.map((team) => [team.team_id, team.name]));
@@ -58,6 +76,17 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
           Código <span className="font-mono font-semibold text-foreground">{room.code}</span> ·{" "}
           {ROOM_STATUS_LABEL[room.status]} · {formatMillions(room.initial_budget)} por equipo
         </p>
+      </div>
+
+      <div className="flex flex-col gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+        <span className="text-sm text-foreground/70">Enlace para los presidentes</span>
+        <div className="flex items-center justify-between gap-3">
+          <span className="truncate font-mono text-sm">{roomUrl}</span>
+          <CopyButton value={roomUrl} />
+        </div>
+        <span className="text-xs text-foreground/50">
+          Cada presidente elige su equipo y entra con el PIN de su tarjeta.
+        </span>
       </div>
 
       <section className="flex flex-col gap-4">
@@ -103,6 +132,20 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
                     </dd>
                   </div>
                 </dl>
+                <div className="flex items-center justify-between gap-2 border-t border-foreground/10 pt-3 text-sm">
+                  <span className="text-foreground/60">
+                    PIN{" "}
+                    <span className="font-mono text-base font-semibold tracking-widest text-foreground">
+                      {pins.get(team.team_id) ?? "—"}
+                    </span>
+                  </span>
+                  <form action={regenerateTeamPin}>
+                    <input type="hidden" name="teamId" value={team.team_id ?? ""} />
+                    <button type="submit" className="text-foreground/60 hover:text-foreground">
+                      Nuevo PIN
+                    </button>
+                  </form>
+                </div>
               </li>
             ))}
           </ul>
