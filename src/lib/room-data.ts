@@ -48,7 +48,10 @@ export type AuctionView = {
   playerPosition: string | null;
   startingPrice: number;
   currentPrice: number | null;
+  leadingTeamId: string | null;
   leadingTeamName: string | null;
+  // Últimas pujas, de la más alta (la más reciente) a la más baja
+  recentBids: { teamName: string; amount: number }[];
   endsAt: string | null;
   pausedRemainingMs: number | null;
   // Hora del servidor al generar la página: el contador la usa para
@@ -61,10 +64,12 @@ export async function getOpenAuction(roomId: string): Promise<AuctionView | null
   const { data, error } = await supabaseAdmin
     .from("auctions")
     .select(
-      "id, status, starting_price, current_price, ends_at, paused_remaining_ms, player:players(name, position), leading_team:teams(name)",
+      "id, status, starting_price, current_price, leading_team_id, ends_at, paused_remaining_ms, player:players(name, position), leading_team:teams(name), bids(amount, team:teams(name))",
     )
     .eq("room_id", roomId)
     .in("status", ["running", "paused"])
+    .order("amount", { referencedTable: "bids", ascending: false })
+    .limit(6, { referencedTable: "bids" })
     .maybeSingle();
 
   if (error) throw new Error("No se pudo cargar la subasta");
@@ -77,7 +82,9 @@ export async function getOpenAuction(roomId: string): Promise<AuctionView | null
     playerPosition: data.player.position,
     startingPrice: data.starting_price,
     currentPrice: data.current_price,
+    leadingTeamId: data.leading_team_id,
     leadingTeamName: data.leading_team?.name ?? null,
+    recentBids: data.bids.map((bid) => ({ teamName: bid.team?.name ?? "", amount: bid.amount })),
     endsAt: data.ends_at,
     pausedRemainingMs: data.paused_remaining_ms,
     serverNow: new Date().toISOString(),

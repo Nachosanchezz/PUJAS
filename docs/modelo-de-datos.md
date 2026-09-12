@@ -108,7 +108,11 @@ start_auction    jugador disponible  ->  subasta 'running' (ends_at = ahora + 15
 pause_auction    'running'           ->  'paused'  (guarda los ms que quedaban)
 resume_auction   'paused'            ->  'running' (ends_at = ahora + lo que quedaba)
 cancel_auction   'running'/'paused'  ->  'cancelled' y el jugador vuelve a la lista
+place_bid        puja validada: tiempo, precio, puja máxima, plazas y "ya vas ganando";
+                 si quedan menos de 5 s, ends_at = ahora + 5 s
 ```
+
+`place_bid` bloquea la fila de la subasta (`for update`): si dos presidentes pujan en el mismo instante, la segunda puja espera a la primera y se valida contra el precio ya actualizado.
 
 Solo puede haber una subasta abierta por sala. La primera que se abre pasa la sala de `setup` a `live`, y a partir de ahí no se pueden añadir equipos.
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { leaveRoom } from "@/app/room/actions";
 import { AuctionCard } from "@/components/auction/auction-card";
+import { BidPanel } from "@/components/auction/bid-panel";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { JoinForm } from "@/components/room/join-form";
 import { StandingsList } from "@/components/room/standings-list";
@@ -69,7 +70,23 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
       {heading}
 
       {auction ? (
-        <AuctionCard auction={auction} />
+        <div className="flex flex-col gap-4">
+          <AuctionCard auction={auction} />
+          {myTeam && (
+            <BidPanel
+              roomCode={room.code}
+              auctionId={auction.id}
+              status={auction.status}
+              startingPrice={auction.startingPrice}
+              currentPrice={auction.currentPrice}
+              endsAt={auction.endsAt}
+              serverNow={auction.serverNow}
+              isLeading={auction.leadingTeamId === myTeam.id}
+              maxBid={myTeam.maxBid}
+              slotsLeft={myTeam.squadSizeCap - myTeam.playersCount}
+            />
+          )}
+        </div>
       ) : (
         <p className="rounded-xl border border-foreground/10 p-4 text-center text-foreground/70">
           {WAITING_MESSAGE[room.status]}

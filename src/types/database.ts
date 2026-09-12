@@ -349,6 +349,10 @@ export type Database = {
         Returns: string
       }
       pause_auction: { Args: { p_auction_id: string }; Returns: undefined }
+      place_bid: {
+        Args: { p_amount: number; p_auction_id: string; p_team_id: string }
+        Returns: undefined
+      }
       resume_auction: { Args: { p_auction_id: string }; Returns: undefined }
       start_auction: {
         Args: { p_player_id: string; p_room_id: string }

@@ -28,7 +28,7 @@ export function AuctionCard({ auction }: { auction: AuctionView }) {
 
       <div className="flex flex-col gap-1">
         <span className="text-sm text-foreground/60">{hasBids ? "Puja actual" : "Precio de salida"}</span>
-        <span className="text-5xl font-black tabular-nums">
+        <span data-testid="current-price" className="text-5xl font-black tabular-nums">
           {formatMillions(auction.currentPrice ?? auction.startingPrice)}
         </span>
         <span className="text-foreground/70">
@@ -41,6 +41,22 @@ export function AuctionCard({ auction }: { auction: AuctionView }) {
           )}
         </span>
       </div>
+
+      {auction.recentBids.length > 0 && (
+        <ol aria-label="Últimas pujas" className="flex w-full max-w-xs flex-col gap-1 text-sm">
+          {auction.recentBids.map((bid, index) => (
+            <li
+              key={bid.amount}
+              className={`flex justify-between rounded-lg px-3 py-1.5 ${
+                index === 0 ? "bg-emerald-500/10 font-semibold text-emerald-500" : "text-foreground/60"
+              }`}
+            >
+              <span>{bid.teamName}</span>
+              <span className="tabular-nums">{formatMillions(bid.amount)}</span>
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 }

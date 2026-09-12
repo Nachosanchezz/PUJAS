@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useRemainingMs } from "@/components/auction/use-remaining-ms";
 
 type CountdownProps = {
   endsAt: string | null;
@@ -9,24 +9,7 @@ type CountdownProps = {
 };
 
 export function Countdown({ endsAt, pausedRemainingMs, serverNow }: CountdownProps) {
-  const [remainingMs, setRemainingMs] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!endsAt) return;
-
-    // Diferencia entre el reloj del servidor y el del dispositivo: así todos
-    // ven el mismo contador aunque el móvil tenga la hora mal puesta.
-    const offset = new Date(serverNow).getTime() - Date.now();
-    const end = new Date(endsAt).getTime();
-    const tick = () => setRemainingMs(Math.max(0, end - (Date.now() + offset)));
-
-    const first = setTimeout(tick, 0);
-    const timer = setInterval(tick, 250);
-    return () => {
-      clearTimeout(first);
-      clearInterval(timer);
-    };
-  }, [endsAt, serverNow]);
+  const remainingMs = useRemainingMs(endsAt, serverNow);
 
   const paused = pausedRemainingMs !== null;
   const ms = paused ? pausedRemainingMs : remainingMs;
