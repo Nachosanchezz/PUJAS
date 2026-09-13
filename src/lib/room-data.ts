@@ -8,6 +8,7 @@ export type TeamSummary = {
   captain: string | null;
   playersCount: number;
   squadSizeCap: number;
+  spent: number;
   remaining: number;
   maxBid: number;
 };
@@ -17,7 +18,7 @@ export async function getTeamSummaries(roomId: string): Promise<TeamSummary[]> {
   const [standings, captains] = await Promise.all([
     supabaseAdmin
       .from("team_standings")
-      .select("team_id, name, players_count, squad_size_cap, remaining, max_bid")
+      .select("team_id, name, players_count, squad_size_cap, spent, remaining, max_bid")
       .eq("room_id", roomId)
       .order("name"),
     supabaseAdmin.from("players").select("team_id, name").eq("room_id", roomId).eq("is_captain", true),
@@ -36,9 +37,67 @@ export async function getTeamSummaries(roomId: string): Promise<TeamSummary[]> {
     captain: captainByTeam.get(team.team_id) ?? null,
     playersCount: team.players_count ?? 0,
     squadSizeCap: team.squad_size_cap ?? 0,
+    spent: team.spent ?? 0,
     remaining: team.remaining ?? 0,
     maxBid: team.max_bid ?? 0,
   }));
+}
+
+export type SquadPlayer = {
+  id: string;
+  name: string;
+  position: string | null;
+  price: number;
+  isCaptain: boolean;
+};
+
+export type Squad = TeamSummary & { players: SquadPlayer[] };
+
+export type RoomSquads = {
+  squads: Squad[];
+  soldCount: number;
+  auctionPlayersCount: number;
+};
+
+// Plantilla de cada equipo: el presidente primero y después los fichajes en
+// orden de compra. También cuenta cuántos jugadores de la subasta se han vendido.
+export async function getSquads(roomId: string): Promise<RoomSquads> {
+  const [teams, players] = await Promise.all([
+    getTeamSummaries(roomId),
+    supabaseAdmin
+      .from("players")
+      .select("id, name, position, status, is_captain, team_id, sold_price")
+      .eq("room_id", roomId)
+      .order("sold_at", { ascending: true }),
+  ]);
+
+  if (players.error) throw new Error("No se pudieron cargar las plantillas");
+
+  const byTeam = new Map<string, SquadPlayer[]>();
+  for (const player of players.data) {
+    if (player.status !== "sold" || !player.team_id) continue;
+    const squad = byTeam.get(player.team_id) ?? [];
+    squad.push({
+      id: player.id,
+      name: player.name,
+      position: player.position,
+      price: player.sold_price ?? 0,
+      isCaptain: player.is_captain,
+    });
+    byTeam.set(player.team_id, squad);
+  }
+
+  const auctionPlayers = players.data.filter((player) => !player.is_captain);
+
+  return {
+    squads: teams.map((team) => ({
+      ...team,
+      // sort es estable: el presidente sube arriba y el resto mantiene el orden de compra
+      players: (byTeam.get(team.id) ?? []).sort((a, b) => Number(b.isCaptain) - Number(a.isCaptain)),
+    })),
+    soldCount: auctionPlayers.filter((player) => player.status === "sold").length,
+    auctionPlayersCount: auctionPlayers.length,
+  };
 }
 
 export type AuctionView = {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   assignPlayer,
@@ -72,6 +73,13 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
           <p className="text-sm text-foreground/60">
             {room.name} · <span className="font-mono">{room.code}</span> · {ROOM_STATUS_LABEL[room.status]}
           </p>
+          <Link
+            href={`/room/${room.code}/plantillas`}
+            target="_blank"
+            className="text-sm font-semibold text-emerald-500 hover:text-emerald-400"
+          >
+            Ver plantillas (se abre en otra pestaña) ↗
+          </Link>
         </div>
 
         {auction ? (

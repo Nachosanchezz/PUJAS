@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 
-export function CopyButton({ value }: { value: string }) {
+type CopyButtonProps = {
+  value: string;
+  label?: string;
+};
+
+export function CopyButton({ value, label = "Copiar" }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -12,7 +17,7 @@ export function CopyButton({ value }: { value: string }) {
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // El portapapeles solo funciona en https o localhost: si no, lo mostramos
-      window.prompt("Copia el enlace:", value);
+      window.prompt("Copia el texto:", value);
     }
   }
 
@@ -22,7 +27,7 @@ export function CopyButton({ value }: { value: string }) {
       onClick={copy}
       className="shrink-0 rounded-lg bg-foreground/10 px-3 py-1 text-sm font-semibold transition-colors hover:bg-foreground/20"
     >
-      {copied ? "¡Copiado!" : "Copiar"}
+      {copied ? "¡Copiado!" : label}
     </button>
   );
 }

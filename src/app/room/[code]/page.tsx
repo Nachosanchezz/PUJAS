@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { leaveRoom } from "@/app/room/actions";
 import { AuctionAutoClose } from "@/components/auction/auction-auto-close";
@@ -10,7 +11,7 @@ import { JoinForm } from "@/components/room/join-form";
 import { StandingsList } from "@/components/room/standings-list";
 import { formatMillions } from "@/lib/format";
 import { getPresidentSession } from "@/lib/president-auth";
-import { getLastResult, getOpenAuction, getTeamSummaries } from "@/lib/room-data";
+import { getLastResult, getOpenAuction, getSquads } from "@/lib/room-data";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const metadata: Metadata = {
@@ -36,9 +37,9 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
   if (error) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const [session, teams, auction, lastResult] = await Promise.all([
+  const [session, { squads: teams }, auction, lastResult] = await Promise.all([
     getPresidentSession(room.id),
-    getTeamSummaries(room.id),
+    getSquads(room.id),
     getOpenAuction(room.id),
     getLastResult(room.id),
   ]);
@@ -117,10 +118,33 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
               </div>
             </dl>
           )}
+          {myTeam && (
+            <ul aria-label="Tu plantilla" className="flex flex-col gap-1 border-t border-emerald-500/20 pt-3 text-sm">
+              {myTeam.players.map((player) => (
+                <li key={player.id} className="flex items-center justify-between gap-2">
+                  <span className="truncate">
+                    {player.name}
+                    {player.position && <span className="text-foreground/50"> · {player.position}</span>}
+                  </span>
+                  <span className="shrink-0 tabular-nums text-foreground/70">
+                    {player.isCaptain ? "Presidente" : formatMillions(player.price)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section className="flex flex-col gap-3">
-          <h3 className="font-semibold">Equipos</h3>
+          <div className="flex items-baseline justify-between">
+            <h3 className="font-semibold">Equipos</h3>
+            <Link
+              href={`/room/${room.code}/plantillas`}
+              className="text-sm font-semibold text-emerald-500 hover:text-emerald-400"
+            >
+              Ver plantillas →
+            </Link>
+          </div>
           <StandingsList teams={teams} highlightTeamId={session.teamId} />
         </section>
 
