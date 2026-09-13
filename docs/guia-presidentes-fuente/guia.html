@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Guía para presidentes · Subasta Puja Split 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;1,700;1,800;1,900&family=Barlow:wght@400;500;600;700&display=block" rel="stylesheet" />
+<style>
+  @page { size: 1080px 1920px; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #07080b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Barlow", system-ui, sans-serif; color: #f3f4f6; }
+
+  .slide {
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    padding: 120px 90px 0;
+    break-after: page;
+    background:
+      radial-gradient(ellipse 90% 38% at 50% -6%, rgba(45, 255, 143, 0.17), transparent 70%),
+      #07080b;
+  }
+  .slide:last-child { break-after: auto; }
+
+  .step {
+    font: italic 800 42px "Barlow Condensed", sans-serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2dff8f;
+  }
+  h1 {
+    margin: 14px 0 40px;
+    font: italic 900 118px/0.92 "Barlow Condensed", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+  }
+  p, li { font-size: 44px; line-height: 1.34; color: rgba(243, 244, 246, 0.86); margin: 0 0 26px; }
+  ul { margin: 0; padding: 0; list-style: none; }
+  strong { color: #fff; font-weight: 700; }
+  .hl { color: #2dff8f; }
+  .gold { color: #ffc233; }
+  .red { color: #ff4d5e; }
+  .small { font-size: 36px; color: rgba(243, 244, 246, 0.6); }
+
+  /* Captura de la app, "saliendo" por la parte de abajo como un móvil */
+  .shot {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: var(--top, 860px);
+    bottom: 0;
+    width: var(--w, 760px);
+    overflow: hidden;
+    border: 10px solid #1f232b;
+    border-bottom: none;
+    border-radius: 56px 56px 0 0;
+    background: #07080b;
+    box-shadow: 0 0 140px -40px rgba(45, 255, 143, 0.55);
+  }
+  .shot img { position: absolute; left: 0; width: 100%; display: block; }
+  .shot.top img { top: 0; }
+  .shot.bottom img { bottom: 0; }
+
+  /* Captura completa, centrada */
+  .fit {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: var(--top, 860px);
+    width: var(--w, 760px);
+    border-radius: 44px;
+    border: 10px solid #1f232b;
+    box-shadow: 0 0 140px -40px rgba(45, 255, 143, 0.55);
+    display: block;
+  }
+  .fit.goldglow { box-shadow: 0 0 160px -30px rgba(255, 194, 51, 0.55); }
+
+  /* Portada */
+  .cover { display: flex; flex-direction: column; align-items: center; text-align: center; padding-top: 170px; }
+  .badge {
+    display: inline-block;
+    padding: 14px 34px;
+    border: 3px solid rgba(45, 255, 143, 0.45);
+    border-radius: 999px;
+    background: rgba(45, 255, 143, 0.1);
+    color: #2dff8f;
+    font: 700 34px "Barlow", sans-serif;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+  }
+  .cover h1 { font-size: 168px; margin: 50px 0 30px; }
+  .cover .sub { font: italic 800 64px "Barlow Condensed", sans-serif; text-transform: uppercase; color: #2dff8f; margin-bottom: 20px; }
+
+  /* Tarjetas de lista */
+  .card {
+    display: flex;
+    gap: 34px;
+    align-items: flex-start;
+    padding: 40px 42px;
+    margin-bottom: 30px;
+    border: 3px solid rgba(243, 244, 246, 0.1);
+    border-radius: 36px;
+    background: rgba(243, 244, 246, 0.04);
+  }
+  .card .icon { font-size: 72px; line-height: 1; }
+  .card p { margin: 0; }
+  .card .title { font: italic 800 54px "Barlow Condensed", sans-serif; text-transform: uppercase; color: #fff; margin-bottom: 8px; }
+
+  .codebox {
+    margin: 10px 0 34px;
+    padding: 34px;
+    border-radius: 36px;
+    border: 4px solid #2dff8f;
+    background: rgba(45, 255, 143, 0.08);
+    text-align: center;
+  }
+  .codebox .label { font: 700 32px "Barlow", sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(243, 244, 246, 0.6); }
+  .codebox .code { font: italic 900 150px/1 "Barlow Condensed", sans-serif; letter-spacing: 0.08em; color: #2dff8f; margin: 12px 0; }
+  .codebox a { font: 600 40px "Barlow", sans-serif; color: #fff; text-decoration: underline; text-decoration-color: rgba(45, 255, 143, 0.6); text-underline-offset: 8px; }
+
+  .faq { margin-bottom: 30px; padding-bottom: 28px; border-bottom: 3px solid rgba(243, 244, 246, 0.08); }
+  .faq .q { font: italic 800 52px/1.1 "Barlow Condensed", sans-serif; text-transform: uppercase; color: #fff; margin-bottom: 8px; }
+  .faq .a { font-size: 40px; margin: 0; }
+
+  .rule { display: flex; gap: 30px; align-items: baseline; margin-bottom: 34px; }
+  .rule .num { flex: 0 0 auto; font: italic 900 80px/1 "Barlow Condensed", sans-serif; color: #2dff8f; min-width: 70px; }
+  .rule p { margin: 0; }
+
+  .example {
+    margin-top: 10px;
+    padding: 34px 40px;
+    border-left: 10px solid #ffc233;
+    border-radius: 0 30px 30px 0;
+    background: rgba(255, 194, 51, 0.08);
+  }
+  .example p { font-size: 40px; margin: 0; }
+
+  .footer { position: absolute; left: 90px; right: 90px; bottom: 70px; font-size: 32px; color: rgba(243, 244, 246, 0.4); text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- 1. Portada -->
+<section class="slide cover">
+  <span class="badge">Mercado de fichajes</span>
+  <h1>Subasta<br /><span class="hl">Puja Split 3</span></h1>
+  <div class="sub">Guía para presidentes</div>
+  <p>Cómo pujar desde el móvil, paso a paso.<br />Se lee en 2 minutos.</p>
+  <img class="fit goldglow" style="--top: 1010px; --w: 640px" src="img/paso8-vendido.png" alt="" />
+</section>
+
+<!-- 2. Lo que necesitas -->
+<section class="slide">
+  <div class="step">Antes de empezar</div>
+  <h1>Lo que<br />necesitas</h1>
+  <div class="codebox">
+    <div class="label">Código de la sala</div>
+    <div class="code">ER7PAP</div>
+    <a href="https://pujas-7j22.vercel.app/room/ER7PAP">pujas-7j22.vercel.app/room/ER7PAP</a>
+  </div>
+  <div class="card">
+    <div class="icon">📱</div>
+    <div><div class="title">Tu móvil con internet</div><p>Wi-Fi o datos. No hay que instalar nada ni registrarse.</p></div>
+  </div>
+  <div class="card">
+    <div class="icon">🔒</div>
+    <div><div class="title">El PIN de tu equipo</div><p>Te lo mando por privado. <strong>No se lo pases a nadie</strong>: con él se puja en nombre de tu equipo.</p></div>
+  </div>
+  <div class="card">
+    <div class="icon">🔋</div>
+    <div><div class="title">Batería y pantalla encendida</div><p>Durante la subasta, ten la web abierta y el móvil a mano.</p></div>
+  </div>
+</section>
+
+<!-- 3. Entrar -->
+<section class="slide">
+  <div class="step">Paso 1</div>
+  <h1>Entra en<br />la sala</h1>
+  <p>Abre el enlace, <strong>toca tu equipo</strong>, escribe <strong>tu PIN</strong> y pulsa <span class="hl"><strong>Entrar como presidente</strong></span>.</p>
+  <p class="small">Si fallas el PIN 5 veces seguidas, tu equipo se bloquea 5 minutos.</p>
+  <img class="fit" style="--top: 800px; --w: 690px; padding: 28px 28px 22px; background: #07080b" src="img/paso1-entrar.png" alt="" />
+</section>
+
+<!-- 4. Tu pantalla -->
+<section class="slide">
+  <div class="step">Paso 2</div>
+  <h1>Ya estás<br />dentro</h1>
+  <p>En <strong>Tu equipo</strong> ves tus jugadores, el dinero que te queda y tu <span class="hl"><strong>puja máxima</strong></span>.</p>
+  <p>Espera aquí: cuando salga un jugador, <strong>aparecerá solo</strong>. Aunque recargues, sigues dentro.</p>
+  <div class="shot top" style="--top: 960px; --w: 760px"><img src="img/paso2-sala.png" alt="" /></div>
+</section>
+
+<!-- 5. Sale un jugador -->
+<section class="slide">
+  <div class="step">Paso 3</div>
+  <h1>Sale un<br />jugador</h1>
+  <p>Verás su nombre, el <strong>contador de 15 segundos</strong> y el precio de salida: <strong>1 M€</strong>.</p>
+  <p>Debajo están los botones para pujar.</p>
+  <div class="shot top" style="--top: 880px; --w: 760px"><img src="img/paso3-sale-jugador.png" alt="" /></div>
+</section>
+
+<!-- 6. Pujar con botones -->
+<section class="slide">
+  <div class="step">Paso 4</div>
+  <h1>Puja con<br />un toque</h1>
+  <p><strong>+1</strong>, <strong>+5</strong> y <strong>+10</strong> suben la puja actual. Debajo de cada botón pone <span class="hl"><strong>el total que pujas</strong></span>.</p>
+  <p class="small">Ejemplo: la puja va por 10 M€ → con +5 pujas 15 M€.<br />Si nadie ha pujado aún, se parte de 0: +5 son 5 M€.</p>
+  <img class="fit" style="--top: 820px; --w: 700px" src="img/paso4-pujar.png" alt="" />
+</section>
+
+<!-- 7. Escribir cantidad -->
+<section class="slide">
+  <div class="step">Paso 5</div>
+  <h1>O escribe<br />la cantidad</h1>
+  <p>Escribe los millones en <strong>Otra cantidad</strong> y pulsa <span class="hl"><strong>Pujar</strong></span>. El botón te enseña lo que vas a pujar.</p>
+  <p class="small">Si pones un número raro (150 en vez de 15), te preguntará si estás seguro. Una puja hecha no se retira: si te equivocas, avisa a Nacho.</p>
+  <img class="fit" style="--top: 840px; --w: 685px" src="img/paso5-escribir.png" alt="" />
+</section>
+
+<!-- 8. Vas ganando -->
+<section class="slide">
+  <div class="step">Paso 6</div>
+  <h1>Vas<br /><span class="hl">ganando</span></h1>
+  <p>Si tu puja es la más alta verás <span class="hl"><strong>VAS GANANDO</strong></span>. Mientras vayas primero no puedes volver a pujar.</p>
+  <p>Si alguien te supera, los botones vuelven <strong>al momento</strong>.</p>
+  <img class="fit" style="--top: 820px; --w: 740px" src="img/paso6-vas-ganando.png" alt="" />
+</section>
+
+<!-- 9. Contador -->
+<section class="slide">
+  <div class="step">Paso 7</div>
+  <h1>El<br />contador</h1>
+  <p><span class="hl"><strong>Cada puja vuelve a poner el contador a 15 segundos.</strong></span> Nadie gana pujando en el último instante: siempre hay tiempo para responder.</p>
+  <p class="small">En los últimos 5 segundos se pone en <span class="red">rojo</span>. Si dos pujáis a la vez, cuenta la que llega primero.</p>
+  <img class="fit" style="--top: 1020px; --w: 620px" src="img/paso7-contador.png" alt="" />
+</section>
+
+<!-- 10. Vendido -->
+<section class="slide">
+  <div class="step">Paso 8</div>
+  <h1><span class="gold">¡Vendido!</span></h1>
+  <p>Cuando el contador llega a 0, el jugador es para <strong>quien va ganando</strong>: pasa a su plantilla y se le descuenta su precio.</p>
+  <p class="small">Si nadie puja, sale «Sin pujas» y el jugador puede volver a salir más tarde.</p>
+  <img class="fit goldglow" style="--top: 880px; --w: 740px" src="img/paso8-vendido.png" alt="" />
+</section>
+
+<!-- 11. El dinero -->
+<section class="slide">
+  <div class="step">Las reglas</div>
+  <h1>Tu dinero</h1>
+  <div class="rule"><div class="num">1</div><p>Cada equipo empieza con <strong>200 M€</strong>.</p></div>
+  <div class="rule"><div class="num">2</div><p>Tu <span class="hl"><strong>puja máxima</strong></span> guarda <strong>1 M€ por cada plaza</strong> que aún te quede por llenar, para que siempre puedas completar el equipo.</p></div>
+  <div class="example">
+    <p><span class="gold"><strong>Ejemplo:</strong></span> al empezar tienes 200 M€ y 7 plazas libres. Por el primer jugador puedes pujar hasta <strong>194 M€</strong> (te guardas 1 M€ para cada una de las otras 6).</p>
+  </div>
+  <div class="rule" style="margin-top: 34px"><div class="num">3</div><p>La web no te deja pasar de tu puja máxima: el botón sale <strong>apagado</strong>.</p></div>
+  <img class="fit" style="--top: 1230px; --w: 820px" src="img/paso9-mi-equipo.png" alt="" />
+</section>
+
+<!-- 12. Plantillas -->
+<section class="slide">
+  <div class="step">Las reglas</div>
+  <h1>Plantillas</h1>
+  <p><strong>3 equipos acaban con 8 jugadores y 2 con 7</strong>. Tú, el presidente, cuentas como uno.</p>
+  <p class="small">Todos podéis llegar a 8 hasta que 3 equipos lo consigan; entonces los otros dos se quedan en 7.</p>
+  <p>Arriba tienes <strong>Sala · Plantillas · Historial</strong>: ahí ves quién ha fichado a quién, por cuánto y cuánto le queda a cada uno.</p>
+  <div class="shot top" style="--top: 1090px; --w: 760px"><img src="img/paso10-plantillas.png" alt="" /></div>
+</section>
+
+<!-- 13. ¿Y si...? -->
+<section class="slide">
+  <div class="step">Por si acaso</div>
+  <h1>¿Y si…?</h1>
+  <div class="faq"><div class="q">…la pantalla no se actualiza</div><p class="a">Recarga la página. Sigues dentro.</p></div>
+  <div class="faq"><div class="q">…se me bloquea el móvil</div><p class="a">Al desbloquearlo, la web se pone al día sola.</p></div>
+  <div class="faq"><div class="q">…me salgo de la sala</div><p class="a">Vuelve a abrir el enlace y entra con tu equipo y tu PIN.</p></div>
+  <div class="faq"><div class="q">…me dice «PIN incorrecto»</div><p class="a">Revisa el mensaje con tu PIN. Si sigue fallando, avisa a Nacho.</p></div>
+  <div class="faq"><div class="q">…no me deja pujar</div><p class="a">Lee el aviso: vas ganando, se ha acabado el tiempo, tu plantilla está completa o superas tu puja máxima.</p></div>
+  <div class="faq" style="border: none"><div class="q">…me equivoco al pujar</div><p class="a">Avisa a Nacho (el admin): puede corregirlo.</p></div>
+</section>
+
+<!-- 14. Resumen -->
+<section class="slide">
+  <div class="step">En resumen</div>
+  <h1>5 cosas<br />y a pujar</h1>
+  <div class="rule"><div class="num">1</div><p>Abre el enlace y entra con <strong>tu equipo y tu PIN</strong>.</p></div>
+  <div class="rule"><div class="num">2</div><p>Espera a que salga un jugador: <strong>aparece solo</strong>.</p></div>
+  <div class="rule"><div class="num">3</div><p>Puja con <strong>+1 / +5 / +10</strong> o escribe la cantidad.</p></div>
+  <div class="rule"><div class="num">4</div><p><span class="hl"><strong>Cada puja = el contador vuelve a 15 s.</strong></span></p></div>
+  <div class="rule"><div class="num">5</div><p>Al llegar a 0, <span class="gold"><strong>VENDIDO</strong></span> para quien va ganando.</p></div>
+  <p style="margin-top: 70px; text-align: center; font: italic 800 72px 'Barlow Condensed', sans-serif; text-transform: uppercase; color: #2dff8f">¡Suerte y buen mercado! ⚽</p>
+  <div class="footer">pujas-7j22.vercel.app · Sala ER7PAP</div>
+</section>
+
+</body>
+</html>
