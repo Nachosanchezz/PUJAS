@@ -8,6 +8,7 @@ import { BidPanel } from "@/components/auction/bid-panel";
 import { SaleResultCard } from "@/components/auction/sale-result-card";
 import { RoomRealtime } from "@/components/realtime/room-realtime";
 import { JoinForm } from "@/components/room/join-form";
+import { RoomNav } from "@/components/room/room-nav";
 import { StandingsList } from "@/components/room/standings-list";
 import { formatMillions } from "@/lib/format";
 import { getPresidentSession } from "@/lib/president-auth";
@@ -45,11 +46,14 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
   ]);
 
   const heading = (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
-        Sala {room.code}
-      </span>
-      <h1 className="text-3xl font-bold tracking-tight">{room.name}</h1>
+    <div className="flex flex-col gap-3">
+      <RoomNav code={room.code} current="sala" />
+      <div className="flex flex-col gap-1">
+        <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
+          Sala {room.code}
+        </span>
+        <h1 className="text-3xl font-bold tracking-tight">{room.name}</h1>
+      </div>
     </div>
   );
 

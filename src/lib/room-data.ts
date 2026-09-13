@@ -118,6 +118,101 @@ export type AuctionView = {
   serverNow: string;
 };
 
+export type HistoryBid = { teamName: string; amount: number; at: string };
+
+export type HistoryEntry = {
+  auctionId: string;
+  status: "sold" | "unsold" | "cancelled";
+  playerId: string;
+  playerName: string;
+  playerPosition: string | null;
+  winnerName: string | null;
+  price: number | null;
+  closedAt: string;
+  // Se vendió, pero el admin deshizo la venta después
+  undone: boolean;
+  bids: HistoryBid[];
+};
+
+export type ManualSale = {
+  playerId: string;
+  playerName: string;
+  teamName: string;
+  price: number;
+  at: string;
+};
+
+export type RoomHistory = { entries: HistoryEntry[]; manualSales: ManualSale[] };
+
+// Todas las subastas cerradas con sus pujas (de la más reciente a la más
+// antigua) y las ventas que no salieron de una subasta (adjudicadas a mano).
+export async function getHistory(roomId: string): Promise<RoomHistory> {
+  const [auctions, sold] = await Promise.all([
+    supabaseAdmin
+      .from("auctions")
+      .select(
+        "id, status, current_price, closed_at, leading_team_id, player:players(id, name, position, status, team_id, sold_price), leading_team:teams(name), bids(amount, created_at, team:teams(name))",
+      )
+      .eq("room_id", roomId)
+      .in("status", ["sold", "unsold", "cancelled"])
+      .order("closed_at", { ascending: false })
+      .order("amount", { referencedTable: "bids", ascending: true }),
+    supabaseAdmin
+      .from("players")
+      .select("id, name, sold_price, sold_at, team:teams(name)")
+      .eq("room_id", roomId)
+      .eq("status", "sold")
+      .eq("is_captain", false),
+  ]);
+
+  if (auctions.error || sold.error) throw new Error("No se pudo cargar el historial");
+
+  const entries: HistoryEntry[] = auctions.data.flatMap((auction) => {
+    if (!auction.player) return [];
+    const isSold = auction.status === "sold";
+    // Sigue en el equipo que la ganó y por ese precio: la venta sigue en pie
+    const stillSold =
+      auction.player.status === "sold" &&
+      auction.player.team_id === auction.leading_team_id &&
+      auction.player.sold_price === auction.current_price;
+
+    return [
+      {
+        auctionId: auction.id,
+        status: auction.status as HistoryEntry["status"],
+        playerId: auction.player.id,
+        playerName: auction.player.name,
+        playerPosition: auction.player.position,
+        winnerName: isSold ? (auction.leading_team?.name ?? null) : null,
+        price: isSold ? auction.current_price : null,
+        closedAt: auction.closed_at ?? "",
+        undone: isSold && !stillSold,
+        bids: auction.bids.map((bid) => ({
+          teamName: bid.team?.name ?? "",
+          amount: bid.amount,
+          at: bid.created_at,
+        })),
+      },
+    ];
+  });
+
+  const soldInAuctions = new Set(
+    entries.filter((entry) => entry.status === "sold" && !entry.undone).map((entry) => entry.playerId),
+  );
+  const manualSales = sold.data
+    .filter((player) => !soldInAuctions.has(player.id))
+    .map((player) => ({
+      playerId: player.id,
+      playerName: player.name,
+      teamName: player.team?.name ?? "",
+      price: player.sold_price ?? 0,
+      at: player.sold_at ?? "",
+    }))
+    .sort((a, b) => b.at.localeCompare(a.at));
+
+  return { entries, manualSales };
+}
+
 export type SaleResult = {
   auctionId: string;
   status: "sold" | "unsold";

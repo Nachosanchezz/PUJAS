@@ -73,13 +73,22 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
           <p className="text-sm text-foreground/60">
             {room.name} · <span className="font-mono">{room.code}</span> · {ROOM_STATUS_LABEL[room.status]}
           </p>
-          <Link
-            href={`/room/${room.code}/plantillas`}
-            target="_blank"
-            className="text-sm font-semibold text-emerald-500 hover:text-emerald-400"
-          >
-            Ver plantillas (se abre en otra pestaña) ↗
-          </Link>
+          <div className="flex flex-wrap gap-4 text-sm font-semibold">
+            <Link
+              href={`/room/${room.code}/plantillas`}
+              target="_blank"
+              className="text-emerald-500 hover:text-emerald-400"
+            >
+              Plantillas ↗
+            </Link>
+            <Link
+              href={`/room/${room.code}/historial`}
+              target="_blank"
+              className="text-emerald-500 hover:text-emerald-400"
+            >
+              Historial ↗
+            </Link>
+          </div>
         </div>
 
         {auction ? (

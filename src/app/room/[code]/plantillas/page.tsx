@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RoomRealtime } from "@/components/realtime/room-realtime";
+import { RoomNav } from "@/components/room/room-nav";
 import { SquadCard } from "@/components/room/squad-card";
 import { CopyButton } from "@/components/ui/copy-button";
 import { formatMillions } from "@/lib/format";
@@ -44,10 +44,8 @@ export default async function SquadsPage({ params }: PageProps<"/room/[code]/pla
   return (
     <RoomRealtime roomId={room.id}>
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-6 py-12">
-        <div className="flex flex-col gap-2">
-          <Link href={`/room/${room.code}`} className="text-sm text-foreground/60 hover:text-foreground">
-            ← Volver a la sala
-          </Link>
+        <div className="flex flex-col gap-3">
+          <RoomNav code={room.code} current="plantillas" />
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="flex flex-col gap-1">
               <h1 className="text-3xl font-bold tracking-tight">Plantillas</h1>
