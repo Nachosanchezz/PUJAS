@@ -3,47 +3,34 @@
 import { useActionState } from "react";
 import { placeBid } from "@/app/room/actions";
 import type { FormState } from "@/components/action-form";
+import { useLiveAuction } from "@/components/auction/use-live-auction";
 import { useRemainingMs } from "@/components/auction/use-remaining-ms";
 import { formatMillions } from "@/lib/format";
-import type { Enums } from "@/types/database";
+import type { AuctionView } from "@/lib/room-data";
 
 const INCREMENTS = [1, 5, 10];
 
 type BidPanelProps = {
-  roomCode: string;
-  auctionId: string;
-  status: Enums<"auction_status">;
-  startingPrice: number;
-  currentPrice: number | null;
-  endsAt: string | null;
-  serverNow: string;
-  isLeading: boolean;
+  auction: AuctionView;
+  myTeamId: string;
   maxBid: number;
   slotsLeft: number;
 };
 
 const initialState: FormState = { error: null };
 
-export function BidPanel({
-  roomCode,
-  auctionId,
-  status,
-  startingPrice,
-  currentPrice,
-  endsAt,
-  serverNow,
-  isLeading,
-  maxBid,
-  slotsLeft,
-}: BidPanelProps) {
+export function BidPanel({ auction, myTeamId, maxBid, slotsLeft }: BidPanelProps) {
   const [state, formAction, pending] = useActionState(placeBid, initialState);
-  const remainingMs = useRemainingMs(endsAt, serverNow);
+  const live = useLiveAuction(auction);
+  const remainingMs = useRemainingMs(live.endsAt, live.serverNow);
+  const isLeading = live.leadingTeamId === myTeamId;
 
   // Si todavía no hay pujas se parte de 0 (+5 = 5 M€), sin bajar del precio de salida
-  const base = currentPrice ?? 0;
+  const base = live.currentPrice ?? 0;
 
   let notice: string | null = null;
-  if (status === "paused") notice = "Subasta en pausa";
+  if (live.status === "paused") notice = "Subasta en pausa";
+  else if (live.status !== "running") notice = "Subasta cerrada";
   else if (remainingMs === 0) notice = "Se ha acabado el tiempo";
   else if (slotsLeft <= 0) notice = "Tu plantilla está completa";
   else if (isLeading) notice = "Vas ganando";
@@ -51,15 +38,12 @@ export function BidPanel({
   return (
     // Cada botón envía su propia cantidad: el botón pulsado viaja en el formulario
     <form action={formAction} className="flex flex-col gap-3">
-      <input type="hidden" name="roomCode" value={roomCode} />
-      <input type="hidden" name="auctionId" value={auctionId} />
+      <input type="hidden" name="auctionId" value={live.id} />
 
       {notice ? (
         <p
           className={`rounded-xl py-5 text-center text-lg font-bold ${
-            isLeading && notice === "Vas ganando"
-              ? "bg-emerald-500/15 text-emerald-500"
-              : "bg-foreground/5 text-foreground/70"
+            notice === "Vas ganando" ? "bg-emerald-500/15 text-emerald-500" : "bg-foreground/5 text-foreground/70"
           }`}
         >
           {notice}
@@ -67,7 +51,7 @@ export function BidPanel({
       ) : (
         <div className="grid grid-cols-3 gap-3">
           {INCREMENTS.map((increment) => {
-            const amount = Math.max(base + increment, startingPrice);
+            const amount = Math.max(base + increment, live.startingPrice);
             return (
               <button
                 key={increment}

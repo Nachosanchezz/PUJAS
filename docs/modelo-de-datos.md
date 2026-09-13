@@ -110,7 +110,13 @@ resume_auction   'paused'            ->  'running' (ends_at = ahora + lo que que
 cancel_auction   'running'/'paused'  ->  'cancelled' y el jugador vuelve a la lista
 place_bid        puja validada: tiempo, precio, puja máxima, plazas y "ya vas ganando";
                  si quedan menos de 5 s, ends_at = ahora + 5 s
+close_auction    al llegar a 0 (o "Adjudicar ya"): 'sold' si hay ganador (el jugador pasa
+                 a su equipo con el precio de la puja), 'unsold' si nadie pujó
+assign_player    corrección del admin: adjudicar a mano (respeta plazas y puja máxima)
+unassign_player  corrección del admin: deshacer una venta (el equipo recupera el dinero)
 ```
+
+Cualquier pantalla abierta pide `close_auction` cuando su contador llega a 0. La función solo cierra si el tiempo ha terminado de verdad, y bloquea la fila igual que `place_bid`, así que una puja de último segundo que amplía el tiempo nunca se pierde. Cuando se vende el último jugador, la sala pasa a `finished`.
 
 `place_bid` bloquea la fila de la subasta (`for update`): si dos presidentes pujan en el mismo instante, la segunda puja espera a la primera y se valida contra el precio ya actualizado.
 
@@ -118,7 +124,7 @@ Solo puede haber una subasta abierta por sala. La primera que se abre pasa la sa
 
 ## Tiempo real
 
-Un disparador en `auctions` llama a `realtime.send()` con cada cambio (sacar jugador, puja, pausa, reanudar, cancelar) y envía un aviso `changed` al canal privado `room:<id de la sala>`. El aviso no lleva datos: cada pantalla, al recibirlo, vuelve a pedir la página a nuestro servidor.
+Unos disparadores en `auctions` y `players` llaman a `realtime.send()` con cada cambio (sacar jugador, puja, pausa, cierre, correcciones) y envían un aviso `changed` al canal privado `room:<id de la sala>`. El aviso de subasta lleva su estado (precio, quién gana, hora de fin y hora del servidor): las pantallas lo pintan al instante y, además, vuelven a pedir la página al servidor para poner al día todo lo demás.
 
 - Una política RLS en `realtime.messages` deja **escuchar** los canales `room:*` a cualquiera, pero no hay política de `insert`: nadie puede **enviar** avisos falsos desde el navegador.
 - Si el canal falla, las pantallas vuelven a refrescarse cada 3 s. Al reconectar o al volver a la pestaña se ponen al día.

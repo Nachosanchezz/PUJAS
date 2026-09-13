@@ -59,6 +59,43 @@ export type AuctionView = {
   serverNow: string;
 };
 
+export type SaleResult = {
+  auctionId: string;
+  status: "sold" | "unsold";
+  playerName: string;
+  teamName: string | null;
+  price: number | null;
+};
+
+// Resultado de la última subasta cerrada (VENDIDO o sin pujas). Si la última
+// se canceló, o si la venta se deshizo después, no hay nada que mostrar.
+export async function getLastResult(roomId: string): Promise<SaleResult | null> {
+  const { data, error } = await supabaseAdmin
+    .from("auctions")
+    .select("id, status, current_price, player:players(name, status), leading_team:teams(name)")
+    .eq("room_id", roomId)
+    .in("status", ["sold", "unsold", "cancelled"])
+    .order("closed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error("No se pudo cargar el último resultado");
+  if (!data?.player) return null;
+  if (data.status === "sold" && data.player.status === "sold") {
+    return {
+      auctionId: data.id,
+      status: "sold",
+      playerName: data.player.name,
+      teamName: data.leading_team?.name ?? null,
+      price: data.current_price,
+    };
+  }
+  if (data.status === "unsold") {
+    return { auctionId: data.id, status: "unsold", playerName: data.player.name, teamName: null, price: null };
+  }
+  return null;
+}
+
 // El jugador que está ahora mismo en subasta (en marcha o en pausa), si lo hay
 export async function getOpenAuction(roomId: string): Promise<AuctionView | null> {
   const { data, error } = await supabaseAdmin

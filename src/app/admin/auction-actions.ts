@@ -65,6 +65,50 @@ export async function resumeAuction(_state: FormState, formData: FormData): Prom
   return finish(error, "No se pudo reanudar la subasta");
 }
 
+// "Adjudicar ya": cierra al momento y vende a quien vaya ganando
+export async function forceCloseAuction(_state: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+  const auctionId = parseAuctionId(formData);
+  if (!auctionId) return { error: "Datos no válidos" };
+
+  const { error } = await supabaseAdmin.rpc("close_auction", { p_auction_id: auctionId, p_force: true });
+  return finish(error, "No se pudo cerrar la subasta");
+}
+
+const assignSchema = z.object({
+  playerId: z.uuid({ error: "Elige un jugador" }),
+  teamId: z.uuid({ error: "Elige un equipo" }),
+  price: z.coerce.number().int("El precio debe ser un número entero").min(0, "El precio no puede ser negativo"),
+});
+
+export async function assignPlayer(_state: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const parsed = assignSchema.safeParse({
+    playerId: formData.get("playerId"),
+    teamId: formData.get("teamId"),
+    price: formData.get("price"),
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Datos no válidos" };
+
+  const { error } = await supabaseAdmin.rpc("assign_player", {
+    p_player_id: parsed.data.playerId,
+    p_team_id: parsed.data.teamId,
+    p_price: parsed.data.price,
+  });
+  return finish(error, "No se pudo adjudicar el jugador");
+}
+
+export async function unassignPlayer(_state: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const parsed = z.uuid().safeParse(formData.get("playerId"));
+  if (!parsed.success) return { error: "Datos no válidos" };
+
+  const { error } = await supabaseAdmin.rpc("unassign_player", { p_player_id: parsed.data });
+  return finish(error, "No se pudo deshacer la venta");
+}
+
 export async function cancelAuction(_state: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin();
   const auctionId = parseAuctionId(formData);

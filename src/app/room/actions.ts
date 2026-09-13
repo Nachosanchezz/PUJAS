@@ -1,12 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { FormState } from "@/components/action-form";
 import {
   endPresidentSession,
-  getPresidentSession,
+  getCurrentPresident,
   startPresidentSession,
 } from "@/lib/president-auth";
 import { supabaseAdmin } from "@/lib/supabase-admin";
@@ -52,29 +51,22 @@ export async function joinRoom(_state: FormState, formData: FormData): Promise<F
 }
 
 const bidSchema = z.object({
-  roomCode: z.string().regex(ROOM_CODE),
   auctionId: z.uuid(),
   amount: z.coerce.number().int().positive(),
 });
 
+// Pujar tiene que ser rápido: una consulta para la sesión y otra para la puja.
+// place_bid comprueba que el equipo es de la sala de esa subasta.
 export async function placeBid(_state: FormState, formData: FormData): Promise<FormState> {
   const parsed = bidSchema.safeParse({
-    roomCode: formData.get("roomCode"),
     auctionId: formData.get("auctionId"),
     amount: formData.get("amount"),
   });
   if (!parsed.success) return { error: "Puja no válida" };
 
-  const { data: room } = await supabaseAdmin
-    .from("rooms")
-    .select("id")
-    .eq("code", parsed.data.roomCode)
-    .maybeSingle();
-  if (!room) return { error: "Sala no encontrada" };
-
   // El equipo sale de la cookie firmada, NUNCA del formulario: así nadie
   // puede pujar en nombre de otro equipo aunque manipule la petición.
-  const session = await getPresidentSession(room.id);
+  const session = await getCurrentPresident();
   if (!session) return { error: "Tu sesión ha caducado. Vuelve a entrar con tu PIN" };
 
   const { error } = await supabaseAdmin.rpc("place_bid", {
@@ -91,9 +83,17 @@ export async function placeBid(_state: FormState, formData: FormData): Promise<F
     return { error: "No se pudo registrar la puja. Inténtalo de nuevo" };
   }
 
-  // Quien puja ve el resultado al momento; los demás, en su siguiente refresco
-  revalidatePath("/room/[code]", "page");
+  // No hace falta recargar la página: el aviso en tiempo real pinta la puja
+  // en todas las pantallas, también en la de quien ha pujado
   return { error: null };
+}
+
+// La llaman las pantallas cuando su contador llega a 0. No necesita sesión:
+// la función SQL solo cierra la subasta si su tiempo ha terminado de verdad.
+export async function closeExpiredAuction(auctionId: string): Promise<void> {
+  const parsed = z.uuid().safeParse(auctionId);
+  if (!parsed.success) return;
+  await supabaseAdmin.rpc("close_auction", { p_auction_id: parsed.data });
 }
 
 export async function leaveRoom(formData: FormData): Promise<void> {

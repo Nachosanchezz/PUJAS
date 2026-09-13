@@ -1,10 +1,15 @@
+"use client";
+
 import { Countdown } from "@/components/auction/countdown";
+import { useLiveAuction } from "@/components/auction/use-live-auction";
 import { formatMillions } from "@/lib/format";
 import type { AuctionView } from "@/lib/room-data";
 
-// La tarjeta del jugador en subasta: la misma para el admin y los presidentes
+// La tarjeta del jugador en subasta: la misma para el admin y los presidentes.
+// Es de cliente para poder pintar al instante los avisos en tiempo real.
 export function AuctionCard({ auction }: { auction: AuctionView }) {
-  const hasBids = auction.currentPrice !== null;
+  const live = useLiveAuction(auction);
+  const hasBids = live.currentPrice !== null;
 
   return (
     <section
@@ -16,25 +21,21 @@ export function AuctionCard({ auction }: { auction: AuctionView }) {
       </span>
 
       <div className="flex flex-col gap-1">
-        <h2 className="text-4xl font-bold tracking-tight">{auction.playerName}</h2>
-        {auction.playerPosition && <p className="text-foreground/60">{auction.playerPosition}</p>}
+        <h2 className="text-4xl font-bold tracking-tight">{live.playerName}</h2>
+        {live.playerPosition && <p className="text-foreground/60">{live.playerPosition}</p>}
       </div>
 
-      <Countdown
-        endsAt={auction.endsAt}
-        pausedRemainingMs={auction.pausedRemainingMs}
-        serverNow={auction.serverNow}
-      />
+      <Countdown endsAt={live.endsAt} pausedRemainingMs={live.pausedRemainingMs} serverNow={live.serverNow} />
 
       <div className="flex flex-col gap-1">
         <span className="text-sm text-foreground/60">{hasBids ? "Puja actual" : "Precio de salida"}</span>
         <span data-testid="current-price" className="text-5xl font-black tabular-nums">
-          {formatMillions(auction.currentPrice ?? auction.startingPrice)}
+          {formatMillions(live.currentPrice ?? live.startingPrice)}
         </span>
         <span className="text-foreground/70">
           {hasBids ? (
             <>
-              Gana <strong className="text-foreground">{auction.leadingTeamName}</strong>
+              Gana <strong className="text-foreground">{live.leadingTeamName}</strong>
             </>
           ) : (
             "Todavía no hay pujas"
@@ -42,9 +43,9 @@ export function AuctionCard({ auction }: { auction: AuctionView }) {
         </span>
       </div>
 
-      {auction.recentBids.length > 0 && (
+      {live.recentBids.length > 0 && (
         <ol aria-label="Últimas pujas" className="flex w-full max-w-xs flex-col gap-1 text-sm">
-          {auction.recentBids.map((bid, index) => (
+          {live.recentBids.map((bid, index) => (
             <li
               key={bid.amount}
               className={`flex justify-between rounded-lg px-3 py-1.5 ${

@@ -10,6 +10,7 @@ const SESSION_DAYS = 7;
 export type PresidentSession = {
   teamId: string;
   teamName: string;
+  roomId: string;
 };
 
 function getSessionSecret(): string {
@@ -32,8 +33,9 @@ function safeEqual(a: string, b: string): boolean {
   return bufferA.length === bufferB.length && timingSafeEqual(bufferA, bufferB);
 }
 
-// Devuelve el equipo del presidente si su cookie es válida para esta sala
-export async function getPresidentSession(roomId: string): Promise<PresidentSession | null> {
+// El presidente de la cookie, si su firma es válida (en cualquier sala).
+// Para pujar basta con esto: place_bid ya comprueba que el equipo es de la sala.
+export async function getCurrentPresident(): Promise<PresidentSession | null> {
   const value = (await cookies()).get(COOKIE_NAME)?.value;
   const [teamId, signature] = value?.split(".") ?? [];
   if (!signature || !z.uuid().safeParse(teamId).success) return null;
@@ -44,10 +46,16 @@ export async function getPresidentSession(roomId: string): Promise<PresidentSess
     .eq("id", teamId)
     .maybeSingle();
 
-  if (!team || team.room_id !== roomId || !team.team_access) return null;
+  if (!team?.team_access) return null;
   if (!safeEqual(signature, sign(team.id, team.team_access.pin))) return null;
 
-  return { teamId: team.id, teamName: team.name };
+  return { teamId: team.id, teamName: team.name, roomId: team.room_id };
+}
+
+// El presidente de la cookie, solo si es de esta sala
+export async function getPresidentSession(roomId: string): Promise<PresidentSession | null> {
+  const session = await getCurrentPresident();
+  return session?.roomId === roomId ? session : null;
 }
 
 export async function startPresidentSession(teamId: string, pin: string): Promise<void> {

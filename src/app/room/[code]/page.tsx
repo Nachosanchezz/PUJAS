@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { leaveRoom } from "@/app/room/actions";
+import { AuctionAutoClose } from "@/components/auction/auction-auto-close";
 import { AuctionCard } from "@/components/auction/auction-card";
 import { BidPanel } from "@/components/auction/bid-panel";
-import { RealtimeRefresh } from "@/components/realtime-refresh";
+import { SaleResultCard } from "@/components/auction/sale-result-card";
+import { RoomRealtime } from "@/components/realtime/room-realtime";
 import { JoinForm } from "@/components/room/join-form";
 import { StandingsList } from "@/components/room/standings-list";
 import { formatMillions } from "@/lib/format";
 import { getPresidentSession } from "@/lib/president-auth";
-import { getOpenAuction, getTeamSummaries } from "@/lib/room-data";
+import { getLastResult, getOpenAuction, getTeamSummaries } from "@/lib/room-data";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const metadata: Metadata = {
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
 const WAITING_MESSAGE = {
   setup: "La subasta todavía no ha empezado. Deja esta página abierta.",
   live: "Esperando al siguiente jugador…",
-  finished: "La subasta ha terminado.",
+  finished: "¡La subasta ha terminado! Todos los jugadores tienen equipo.",
 } as const;
 
 export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
@@ -34,10 +36,11 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
   if (error) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const [session, teams, auction] = await Promise.all([
+  const [session, teams, auction, lastResult] = await Promise.all([
     getPresidentSession(room.id),
     getTeamSummaries(room.id),
     getOpenAuction(room.id),
+    getLastResult(room.id),
   ]);
 
   const heading = (
@@ -65,70 +68,69 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
   const myTeam = teams.find((team) => team.id === session.teamId);
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-6 py-12">
-      <RealtimeRefresh roomId={room.id} />
-      {heading}
+    <RoomRealtime roomId={room.id}>
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-6 py-12">
+        {heading}
 
-      {auction ? (
-        <div className="flex flex-col gap-4">
-          <AuctionCard auction={auction} />
-          {myTeam && (
-            <BidPanel
-              roomCode={room.code}
-              auctionId={auction.id}
-              status={auction.status}
-              startingPrice={auction.startingPrice}
-              currentPrice={auction.currentPrice}
-              endsAt={auction.endsAt}
-              serverNow={auction.serverNow}
-              isLeading={auction.leadingTeamId === myTeam.id}
-              maxBid={myTeam.maxBid}
-              slotsLeft={myTeam.squadSizeCap - myTeam.playersCount}
-            />
-          )}
-        </div>
-      ) : (
-        <p className="rounded-xl border border-foreground/10 p-4 text-center text-foreground/70">
-          {WAITING_MESSAGE[room.status]}
-        </p>
-      )}
-
-      <section className="flex flex-col gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
-        <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
-          Tu equipo
-        </span>
-        <h2 className="text-3xl font-bold tracking-tight">{session.teamName}</h2>
-        {myTeam && (
-          <dl className="grid grid-cols-3 gap-2 text-sm">
-            <div>
-              <dt className="text-foreground/60">Jugadores</dt>
-              <dd className="text-lg font-semibold">
-                {myTeam.playersCount}/{myTeam.squadSizeCap}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-foreground/60">Restante</dt>
-              <dd className="text-lg font-semibold">{formatMillions(myTeam.remaining)}</dd>
-            </div>
-            <div>
-              <dt className="text-foreground/60">Puja máxima</dt>
-              <dd className="text-lg font-semibold text-emerald-500">{formatMillions(myTeam.maxBid)}</dd>
-            </div>
-          </dl>
+        {auction ? (
+          <div className="flex flex-col gap-4">
+            <AuctionCard auction={auction} />
+            {myTeam && (
+              <BidPanel
+                auction={auction}
+                myTeamId={myTeam.id}
+                maxBid={myTeam.maxBid}
+                slotsLeft={myTeam.squadSizeCap - myTeam.playersCount}
+              />
+            )}
+            <AuctionAutoClose auction={auction} />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {lastResult && <SaleResultCard result={lastResult} />}
+            <p className="rounded-xl border border-foreground/10 p-4 text-center text-foreground/70">
+              {WAITING_MESSAGE[room.status]}
+            </p>
+          </div>
         )}
-      </section>
 
-      <section className="flex flex-col gap-3">
-        <h3 className="font-semibold">Equipos</h3>
-        <StandingsList teams={teams} highlightTeamId={session.teamId} />
-      </section>
+        <section className="flex flex-col gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
+          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
+            Tu equipo
+          </span>
+          <h2 className="text-3xl font-bold tracking-tight">{session.teamName}</h2>
+          {myTeam && (
+            <dl className="grid grid-cols-3 gap-2 text-sm">
+              <div>
+                <dt className="text-foreground/60">Jugadores</dt>
+                <dd className="text-lg font-semibold">
+                  {myTeam.playersCount}/{myTeam.squadSizeCap}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-foreground/60">Restante</dt>
+                <dd className="text-lg font-semibold">{formatMillions(myTeam.remaining)}</dd>
+              </div>
+              <div>
+                <dt className="text-foreground/60">Puja máxima</dt>
+                <dd className="text-lg font-semibold text-emerald-500">{formatMillions(myTeam.maxBid)}</dd>
+              </div>
+            </dl>
+          )}
+        </section>
 
-      <form action={leaveRoom}>
-        <input type="hidden" name="roomCode" value={room.code} />
-        <button type="submit" className="text-sm text-foreground/60 hover:text-foreground">
-          Salir de la sala
-        </button>
-      </form>
-    </main>
+        <section className="flex flex-col gap-3">
+          <h3 className="font-semibold">Equipos</h3>
+          <StandingsList teams={teams} highlightTeamId={session.teamId} />
+        </section>
+
+        <form action={leaveRoom}>
+          <input type="hidden" name="roomCode" value={room.code} />
+          <button type="submit" className="text-sm text-foreground/60 hover:text-foreground">
+            Salir de la sala
+          </button>
+        </form>
+      </main>
+    </RoomRealtime>
   );
 }

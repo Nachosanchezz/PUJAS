@@ -338,7 +338,15 @@ export type Database = {
       }
     }
     Functions: {
+      assign_player: {
+        Args: { p_player_id: string; p_price: number; p_team_id: string }
+        Returns: undefined
+      }
       cancel_auction: { Args: { p_auction_id: string }; Returns: undefined }
+      close_auction: {
+        Args: { p_auction_id: string; p_force?: boolean }
+        Returns: string
+      }
       create_team: {
         Args: {
           p_captain_name: string
@@ -353,11 +361,13 @@ export type Database = {
         Args: { p_amount: number; p_auction_id: string; p_team_id: string }
         Returns: undefined
       }
+      refresh_room_status: { Args: { p_room_id: string }; Returns: undefined }
       resume_auction: { Args: { p_auction_id: string }; Returns: undefined }
       start_auction: {
         Args: { p_player_id: string; p_room_id: string }
         Returns: string
       }
+      unassign_player: { Args: { p_player_id: string }; Returns: undefined }
       verify_team_pin: {
         Args: { p_pin: string; p_team_id: string }
         Returns: string
