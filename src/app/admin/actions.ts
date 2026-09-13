@@ -80,6 +80,49 @@ export async function createRoom(_state: FormState, formData: FormData): Promise
   return { error: "No se pudo generar un código único, inténtalo de nuevo" };
 }
 
+const rulesSchema = z
+  .object({
+    roomId: z.uuid(),
+    auctionSeconds: z.coerce
+      .number()
+      .int("Usa un número entero de segundos")
+      .min(5, "Cada jugador debe durar al menos 5 segundos")
+      .max(300, "Cada jugador puede durar como mucho 300 segundos"),
+    antiSnipeSeconds: z.coerce
+      .number()
+      .int("Usa un número entero de segundos")
+      .min(0, "No puede ser negativo"),
+  })
+  .refine((rules) => rules.antiSnipeSeconds <= rules.auctionSeconds, {
+    error: "Al pujar, el contador no puede volver a más segundos de los que dura cada jugador",
+  });
+
+// Tiempos de la subasta. La duración se aplica al siguiente jugador que salga;
+// el reinicio al pujar, a partir de la siguiente puja.
+export async function updateRoomRules(_state: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const parsed = rulesSchema.safeParse({
+    roomId: formData.get("roomId"),
+    auctionSeconds: formData.get("auctionSeconds"),
+    antiSnipeSeconds: formData.get("antiSnipeSeconds"),
+  });
+  if (!parsed.success) return { error: firstIssue(parsed.error) };
+
+  const { error } = await supabaseAdmin
+    .from("rooms")
+    .update({
+      auction_seconds: parsed.data.auctionSeconds,
+      anti_snipe_seconds: parsed.data.antiSnipeSeconds,
+    })
+    .eq("id", parsed.data.roomId);
+
+  if (error) return { error: "No se pudieron guardar las reglas" };
+
+  revalidatePath(ROOM_PAGE, "page");
+  return { error: null };
+}
+
 // ---------- Equipos ----------
 
 const teamSchema = z.object({

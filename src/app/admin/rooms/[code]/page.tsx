@@ -8,6 +8,7 @@ import {
   deletePlayer,
   importPlayers,
   regenerateTeamPin,
+  updateRoomRules,
 } from "@/app/admin/actions";
 import { ActionForm } from "@/components/action-form";
 import { AdminHeader } from "@/components/admin/admin-header";
@@ -98,6 +99,39 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
         Abrir sala de control
         <span aria-hidden>→</span>
       </Link>
+
+      <section aria-label="Reglas de la subasta" className="flex flex-col gap-4">
+        <SectionTitle title="Reglas de la subasta" />
+        <ActionForm action={updateRoomRules} submitLabel="Guardar reglas">
+          <input type="hidden" name="roomId" value={room.id} />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <TextField
+              label="Segundos por jugador"
+              name="auctionSeconds"
+              type="number"
+              inputMode="numeric"
+              min={5}
+              max={300}
+              defaultValue={room.auction_seconds}
+              required
+            />
+            <TextField
+              label="Al pujar, el contador vuelve a (segundos)"
+              name="antiSnipeSeconds"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              max={300}
+              defaultValue={room.anti_snipe_seconds}
+              required
+            />
+          </div>
+          <p className="text-xs text-foreground/50">
+            Si los dos valen lo mismo, cada puja reinicia el contador entero. La duración se aplica al
+            siguiente jugador que salga; el reinicio, desde la siguiente puja.
+          </p>
+        </ActionForm>
+      </section>
 
       <section className="flex flex-col gap-4">
         <SectionTitle title="Equipos" count={`${teams.length}/${room.max_teams}`} />

@@ -16,6 +16,7 @@
    - ¿Falta alguien? Añádelo en *Jugadores en subasta*: pegando una lista o uno a uno.
    - ¿Sobra alguien? Pulsa *Eliminar* en su fila.
    - Los equipos no se pueden añadir una vez empezada la subasta: revísalo antes.
+   - Los tiempos están en **Reglas de la subasta**, en el mismo panel: segundos por jugador y a cuántos vuelve el contador cuando alguien puja. Ahora mismo: **15 y 15**, así que cada puja reinicia el contador entero.
 2. **Manda a cada presidente, por privado,** el enlace de la sala y su PIN. El PIN de cada equipo está en su tarjeta del panel. Por ejemplo:
    > Mañana es la subasta 🔨 Entra aquí: https://pujas-7j22.vercel.app/room/ER7PAP
    > Tu equipo es **Nacho** y tu PIN es **1234**. No se lo pases a nadie.
@@ -50,9 +51,10 @@
     - Cada botón muestra la **cantidad total** que vas a pujar. Por ejemplo, con la puja en 10 M€, el botón +5 pone **15 M€**.
     - La primera puja parte de 0: **+5 son 5 M€**.
     - Si alguien sube justo antes que tú, tu puja se rechaza. Nunca pujarás más de lo que ves en el botón.
+    - También puedes **escribir la cantidad** en *Otra cantidad* y pulsar **Pujar**. El botón muestra lo que vas a pujar. Si la cantidad parece un error de dedo (por ejemplo, 150 en vez de 15), te pide confirmación antes de pujar.
     - Si vas ganando no puedes pujar: verás **"VAS GANANDO"**.
     - No puedes pasar de **tu puja máxima**, que sale debajo de los botones.
-12. **Anti-último segundo:** si alguien puja cuando quedan **menos de 5 segundos**, el contador **vuelve a 5**.
+12. **Cada puja vuelve a poner el contador a 15 segundos.** Así nadie gana pujando en el último instante: siempre hay tiempo para responder.
 13. **Al llegar a 0:**
     - **Si alguien ha pujado:** sale **VENDIDO** en todas las pantallas. El jugador pasa a la plantilla del ganador y se le descuenta el dinero.
     - **Si nadie ha pujado:** sale **"Sin pujas"** y el jugador vuelve a la lista. El admin puede sacarlo otra vez más tarde.
@@ -66,7 +68,7 @@
 | Precio de salida | 1 M€ |
 | Plantillas | 3 equipos acaban con **8** jugadores y 2 con **7** (presidente incluido). Cuando 3 equipos llegan a 8, los otros dos se quedan con tope 7 |
 | Puja máxima | Lo que te queda − 1 M€ por cada plaza que te falte cubrir después de esta. Así nunca te quedas sin dinero para completar la plantilla |
-| Último segundo | Una puja con menos de 5 s devuelve el contador a 5 |
+| Tiempo | 15 s por jugador, y **cada puja vuelve a poner el contador a 15 s**. Se cambia en *Reglas de la subasta* |
 
 ## 5. Si algo sale mal (admin, en la sala de control)
 

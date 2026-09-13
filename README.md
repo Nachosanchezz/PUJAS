@@ -85,4 +85,4 @@ docs/                  Documentación (modelo de datos y reglas)
 
 ## Reglas de la liga
 
-5 equipos y 38 jugadores (5 capitanes + 33 en subasta). Tres equipos acaban con 8 jugadores y dos con 7. Todos los jugadores salen a 1 M€, y la puja máxima reserva 1 M€ por cada plaza que quede por cubrir. Detalle completo en [docs/modelo-de-datos.md](docs/modelo-de-datos.md).
+5 equipos y 38 jugadores (5 capitanes + 33 en subasta). Tres equipos acaban con 8 jugadores y dos con 7. Todos los jugadores salen a 1 M€, y la puja máxima reserva 1 M€ por cada plaza que quede por cubrir. Cada puja vuelve a poner el contador a 15 s (se configura en *Reglas de la subasta*). Se puede pujar con +1/+5/+10 o escribiendo la cantidad. Detalle completo en [docs/modelo-de-datos.md](docs/modelo-de-datos.md).

@@ -109,7 +109,8 @@ pause_auction    'running'           ->  'paused'  (guarda los ms que quedaban)
 resume_auction   'paused'            ->  'running' (ends_at = ahora + lo que quedaba)
 cancel_auction   'running'/'paused'  ->  'cancelled' y el jugador vuelve a la lista
 place_bid        puja validada: tiempo, precio, puja máxima, plazas y "ya vas ganando";
-                 si quedan menos de 5 s, ends_at = ahora + 5 s
+                 ends_at = máx(ends_at, ahora + anti_snipe_seconds): con 15 y 15
+                 (Puja Split 3), cada puja reinicia el contador entero
 close_auction    al llegar a 0 (o "Adjudicar ya"): 'sold' si hay ganador (el jugador pasa
                  a su equipo con el precio de la puja), 'unsold' si nadie pujó
 assign_player    corrección del admin: adjudicar a mano (respeta plazas y puja máxima)
