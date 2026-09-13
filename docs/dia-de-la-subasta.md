@@ -12,7 +12,7 @@
 
 ## 1. Unos días antes (admin)
 
-1. **Revisa la sala.** Entra en https://pujas-7j22.vercel.app/admin, pon la contraseña y abre **Puja Split 3**. Comprueba que están los **5 equipos con su presidente** y los **33 jugadores**.
+1. **Revisa la sala.** Entra en https://pujas-7j22.vercel.app/admin, pon la contraseña y abre **Puja Split 3**. Comprueba que están los **5 equipos con su presidente** y los **35 jugadores**.
    - ¿Falta alguien? Añádelo en *Jugadores en subasta*: pegando una lista o uno a uno.
    - ¿Sobra alguien? Pulsa *Eliminar* en su fila.
    - Los equipos no se pueden añadir una vez empezada la subasta: revísalo antes.
@@ -58,7 +58,7 @@
 13. **Al llegar a 0:**
     - **Si alguien ha pujado:** sale **VENDIDO** en todas las pantallas. El jugador pasa a la plantilla del ganador y se le descuenta el dinero.
     - **Si nadie ha pujado:** sale **"Sin pujas"** y el jugador vuelve a la lista. El admin puede sacarlo otra vez más tarde.
-14. **El admin saca al siguiente jugador** y se repite hasta vender los 33.
+14. **El admin saca al siguiente jugador** y se repite hasta vender los 35.
 
 ### Reglas que conviene recordar
 
@@ -66,7 +66,7 @@
 |---|---|
 | Presupuesto | 200 M€ por equipo |
 | Precio de salida | 1 M€ |
-| Plantillas | 3 equipos acaban con **8** jugadores y 2 con **7** (presidente incluido). Cuando 3 equipos llegan a 8, los otros dos se quedan con tope 7 |
+| Plantillas | Todos los equipos acaban con **8** jugadores (presidente incluido): cada presidente ficha a 7 |
 | Puja máxima | Lo que te queda − 1 M€ por cada plaza que te falte cubrir después de esta. Así nunca te quedas sin dinero para completar la plantilla |
 | Tiempo | 15 s por jugador, y **cada puja vuelve a poner el contador a 15 s**. Se cambia en *Reglas de la subasta* |
 

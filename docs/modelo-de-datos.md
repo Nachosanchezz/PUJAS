@@ -70,7 +70,7 @@ erDiagram
 |---|---|
 | `rooms` | Una subasta completa y sus reglas: presupuesto, precio mínimo, tamaños de plantilla y tiempos. |
 | `teams` | Los 5 equipos. El presidente es el capitán, que es un jugador más. |
-| `players` | Los 38 jugadores: los 5 capitanes (ya asignados a su equipo, precio 0) y los 33 que salen a subasta. |
+| `players` | Los 40 jugadores: los 5 capitanes (ya asignados a su equipo, precio 0) y los 35 que salen a subasta. |
 | `auctions` | Cada vez que un jugador sale a subasta. Guarda la puja más alta, quién la tiene y a qué hora termina. |
 | `bids` | Todas las pujas, en orden. Es el historial. |
 | `team_access` | El PIN de 4 cifras de cada equipo y el contador de intentos fallidos. Tabla privada: solo la lee el servidor. |
@@ -79,8 +79,9 @@ Un jugador puede tener varias `auctions`: si se cancela o nadie puja, vuelve a l
 
 ## Reglas de la liga
 
-- **38 jugadores**: 5 capitanes + 33 en subasta.
-- **Plantillas dinámicas**: 3 equipos acabarán con 8 jugadores y 2 con 7. Todos pueden llegar a 8 hasta que 3 equipos lo consiguen; a partir de ahí, el resto tiene tope 7.
+- **40 jugadores**: 5 capitanes + 35 en subasta.
+- **Plantillas de 8**: todos los equipos acaban con 8 jugadores (en la sala, `teams_at_max = 5`).
+- La base de datos también admite **plantillas dinámicas**: con `teams_at_max = 3`, todos pueden llegar a 8 hasta que 3 equipos lo consiguen, y a partir de ahí el resto tiene tope 7. Era la regla cuando había 33 jugadores en subasta.
 - **Precio de salida**: 1 M€ para todos.
 - **Sin pujas**: el jugador vuelve a la lista.
 
@@ -95,9 +96,9 @@ Cada plaza que quede libre después de esta puja reserva el precio mínimo, para
 | Situación | Tope | Plazas | Puja máxima |
 |---|---|---|---|
 | Inicio: solo el capitán, 200 M€ | 8 | 7 | 200 − 6 = **194** |
-| 7 jugadores, 20 M€ restantes, menos de 3 equipos llenos | 8 | 1 | 20 − 0 = **20** |
-| 7 jugadores y ya hay 3 equipos con 8 | 7 | 0 | **no puede pujar** |
-| Solo el capitán y ya hay 3 equipos con 8 | 7 | 6 | 200 − 5 = **195** |
+| 4 jugadores, 120 M€ restantes | 8 | 4 | 120 − 3 = **117** |
+| 7 jugadores, 20 M€ restantes | 8 | 1 | 20 − 0 = **20** |
+| 8 jugadores (plantilla completa) | 8 | 0 | **no puede pujar** |
 
 La vista `team_standings` calcula todo esto en la base de datos.
 
