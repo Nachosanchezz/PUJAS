@@ -27,6 +27,8 @@ const ROOM_PAGE = "/admin/rooms/[code]";
 export async function login(_state: FormState, formData: FormData): Promise<FormState> {
   const password = formData.get("password");
   if (typeof password !== "string" || !isValidAdminPassword(password)) {
+    // Frena a quien intente adivinar la contraseña probando muchas seguidas
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return { error: "Contraseña incorrecta" };
   }
   await startAdminSession();

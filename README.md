@@ -40,6 +40,26 @@ npm run db:push    # aplica las migraciones pendientes de supabase/migrations/
 npm run db:types   # regenera src/types/database.ts a partir del esquema
 ```
 
+## Páginas
+
+| Ruta | Para quién | Qué hace |
+|---|---|---|
+| `/` | Todos | Portada; entrar a una sala con su código |
+| `/room/CÓDIGO` | Presidentes | Entrar con PIN, ver la subasta y pujar |
+| `/room/CÓDIGO/plantillas` | Todos | Plantillas y presupuestos, en tiempo real |
+| `/room/CÓDIGO/historial` | Todos | Todas las subastas con sus pujas |
+| `/admin` | Admin | Salas, equipos, PIN e importación de jugadores |
+| `/admin/rooms/CÓDIGO/live` | Admin | Sala de control de la subasta en directo |
+| `/status` | Admin | Comprueba la conexión con la base de datos |
+
+## Despliegue (Vercel)
+
+- El proyecto se publica en Vercel desde GitHub: **cada push a `main` se despliega solo**.
+- `vercel.json` fija la región `fra1` (Frankfurt), la misma que la base de datos de Supabase, para que cada consulta no cruce el Atlántico.
+- Variables de entorno necesarias en Vercel (las mismas que en `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_PASSWORD` y `SESSION_SECRET`.
+- Las migraciones de la base de datos no se aplican al desplegar: se aplican con `npm run db:push`.
+- Antes del día de la subasta, sigue la guía [docs/dia-de-la-subasta.md](docs/dia-de-la-subasta.md).
+
 ## Scripts
 
 | Comando | Qué hace |
