@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { leaveRoom } from "@/app/room/actions";
 import { AuctionCard } from "@/components/auction/auction-card";
 import { BidPanel } from "@/components/auction/bid-panel";
-import { AutoRefresh } from "@/components/auto-refresh";
+import { RealtimeRefresh } from "@/components/realtime-refresh";
 import { JoinForm } from "@/components/room/join-form";
 import { StandingsList } from "@/components/room/standings-list";
 import { formatMillions } from "@/lib/format";
@@ -66,7 +66,7 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-6 py-12">
-      <AutoRefresh />
+      <RealtimeRefresh roomId={room.id} />
       {heading}
 
       {auction ? (

@@ -9,7 +9,7 @@ import {
 import { ActionButton } from "@/components/action-button";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { AuctionCard } from "@/components/auction/auction-card";
-import { AutoRefresh } from "@/components/auto-refresh";
+import { RealtimeRefresh } from "@/components/realtime-refresh";
 import { StandingsList } from "@/components/room/standings-list";
 import { SectionTitle } from "@/components/ui/section-title";
 import { requireAdmin } from "@/lib/admin-auth";
@@ -49,7 +49,7 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
-      <AutoRefresh />
+      <RealtimeRefresh roomId={room.id} />
 
       <div className="flex flex-col gap-2">
         <AdminHeader title="Sala de control" backHref={`/admin/rooms/${room.code}`} />

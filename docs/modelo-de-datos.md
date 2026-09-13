@@ -116,6 +116,13 @@ place_bid        puja validada: tiempo, precio, puja máxima, plazas y "ya vas g
 
 Solo puede haber una subasta abierta por sala. La primera que se abre pasa la sala de `setup` a `live`, y a partir de ahí no se pueden añadir equipos.
 
+## Tiempo real
+
+Un disparador en `auctions` llama a `realtime.send()` con cada cambio (sacar jugador, puja, pausa, reanudar, cancelar) y envía un aviso `changed` al canal privado `room:<id de la sala>`. El aviso no lleva datos: cada pantalla, al recibirlo, vuelve a pedir la página a nuestro servidor.
+
+- Una política RLS en `realtime.messages` deja **escuchar** los canales `room:*` a cualquiera, pero no hay política de `insert`: nadie puede **enviar** avisos falsos desde el navegador.
+- Si el canal falla, las pantallas vuelven a refrescarse cada 3 s. Al reconectar o al volver a la pestaña se ponen al día.
+
 ## Decisiones de diseño
 
 - **El presupuesto restante no se guarda: se calcula** (inicial − suma de lo pagado). Así, si el administrador corrige una adjudicación, el presupuesto se ajusta solo y nunca puede quedar descuadrado.
