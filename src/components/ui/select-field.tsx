@@ -15,7 +15,7 @@ export function SelectField({ label, options, placeholder, className, ...selectP
       <select
         defaultValue=""
         {...selectProps}
-        className={`rounded-lg border border-foreground/15 bg-background px-3 py-2 text-base outline-none transition-colors focus:border-emerald-500 ${className ?? ""}`}
+        className={`rounded-lg border border-foreground/15 bg-background px-3 py-2 text-base outline-none transition-colors focus:border-brand ${className ?? ""}`}
       >
         {placeholder && (
           <option value="" disabled>

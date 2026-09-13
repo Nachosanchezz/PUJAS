@@ -54,7 +54,7 @@ export default async function AdminPage() {
               <li key={room.id}>
                 <Link
                   href={`/admin/rooms/${room.code}`}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-foreground/10 px-4 py-3 transition-colors hover:border-emerald-500/50"
+                  className="flex items-center justify-between gap-4 rounded-xl border border-foreground/10 px-4 py-3 transition-colors hover:border-brand/50"
                 >
                   <span className="font-semibold">{room.name}</span>
                   <span className="flex items-center gap-3 text-sm text-foreground/60">

@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
+/* Tema único oscuro, estilo retransmisión deportiva */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+  --background: #07080b;
+  --foreground: #f3f4f6;
 }
 
 @theme inline {
@@ -10,16 +12,89 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-barlow-condensed);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Colores con significado: si algún día cambian, se cambian solo aquí */
+@theme {
+  /* Verde neón: acciones principales, "vas ganando", en directo */
+  --color-brand: #2dff8f;
+  --color-brand-light: #8affc1;
+  /* Dorado: VENDIDO y fichajes */
+  --color-gold: #ffc233;
+  /* Rojo: últimos segundos, errores y acciones peligrosas */
+  --color-alert: #ff4d5e;
+  --color-alert-light: #ff8a95;
+
+  /* Animaciones: "golpe" al cambiar el precio, sello de VENDIDO y parpadeo */
+  --animate-pop: pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.4);
+  --animate-stamp: stamp 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  --animate-urgent: urgent 0.8s ease-in-out infinite;
+
+  @keyframes pop {
+    0% {
+      transform: scale(1.25);
+      color: var(--color-brand);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes stamp {
+    0% {
+      transform: scale(2.4) rotate(-14deg);
+      opacity: 0;
+    }
+    60% {
+      transform: scale(0.94) rotate(-8deg);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1) rotate(-8deg);
+      opacity: 1;
+    }
+  }
+
+  @keyframes urgent {
+    50% {
+      opacity: 0.45;
+    }
+  }
+}
+
+@layer base {
+  /* Títulos con la tipografía de rótulo de televisión */
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-style: italic;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+
+  ::selection {
+    background: var(--color-brand);
+    color: #000;
   }
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(ellipse 80% 45% at 50% -10%, color-mix(in oklab, var(--color-brand) 14%, transparent), transparent 70%),
+    var(--background);
+  background-attachment: fixed;
   color: var(--foreground);
+}
+
+/* Quien tiene activado "reducir movimiento" en su móvil no ve animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -77,14 +77,14 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
             <Link
               href={`/room/${room.code}/plantillas`}
               target="_blank"
-              className="text-emerald-500 hover:text-emerald-400"
+              className="text-brand hover:text-brand-light"
             >
               Plantillas ↗
             </Link>
             <Link
               href={`/room/${room.code}/historial`}
               target="_blank"
-              className="text-emerald-500 hover:text-emerald-400"
+              className="text-brand hover:text-brand-light"
             >
               Historial ↗
             </Link>

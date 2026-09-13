@@ -14,7 +14,7 @@ export function SquadCard({ team, highlight = false }: SquadCardProps) {
     <section
       aria-label={`Plantilla de ${team.name}`}
       className={`flex flex-col gap-4 rounded-2xl border p-5 ${
-        highlight ? "border-emerald-500/50 bg-emerald-500/5" : "border-foreground/10"
+        highlight ? "border-brand/50 bg-brand/5" : "border-foreground/10"
       }`}
     >
       <div className="flex items-baseline justify-between gap-2">
@@ -35,7 +35,7 @@ export function SquadCard({ team, highlight = false }: SquadCardProps) {
         </div>
         <div>
           <dt className="text-foreground/60">Puja máx.</dt>
-          <dd className="font-semibold text-emerald-500">{formatMillions(team.maxBid)}</dd>
+          <dd className="font-semibold text-brand">{formatMillions(team.maxBid)}</dd>
         </div>
       </dl>
 
@@ -50,7 +50,7 @@ export function SquadCard({ team, highlight = false }: SquadCardProps) {
               {player.position && <span className="text-foreground/50"> · {player.position}</span>}
             </span>
             {player.isCaptain ? (
-              <span className="shrink-0 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-500">
+              <span className="shrink-0 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-semibold text-brand">
                 Presidente
               </span>
             ) : (

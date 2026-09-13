@@ -49,7 +49,7 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
     <div className="flex flex-col gap-3">
       <RoomNav code={room.code} current="sala" />
       <div className="flex flex-col gap-1">
-        <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
+        <span className="text-xs font-semibold uppercase tracking-widest text-brand">
           Sala {room.code}
         </span>
         <h1 className="text-3xl font-bold tracking-tight">{room.name}</h1>
@@ -99,8 +99,8 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
           </div>
         )}
 
-        <section className="flex flex-col gap-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-5">
-          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-500">
+        <section className="flex flex-col gap-4 rounded-2xl border border-brand/30 bg-brand/5 p-5">
+          <span className="text-xs font-semibold uppercase tracking-widest text-brand">
             Tu equipo
           </span>
           <h2 className="text-3xl font-bold tracking-tight">{session.teamName}</h2>
@@ -118,12 +118,12 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
               </div>
               <div>
                 <dt className="text-foreground/60">Puja máxima</dt>
-                <dd className="text-lg font-semibold text-emerald-500">{formatMillions(myTeam.maxBid)}</dd>
+                <dd className="text-lg font-semibold text-brand">{formatMillions(myTeam.maxBid)}</dd>
               </div>
             </dl>
           )}
           {myTeam && (
-            <ul aria-label="Tu plantilla" className="flex flex-col gap-1 border-t border-emerald-500/20 pt-3 text-sm">
+            <ul aria-label="Tu plantilla" className="flex flex-col gap-1 border-t border-brand/20 pt-3 text-sm">
               {myTeam.players.map((player) => (
                 <li key={player.id} className="flex items-center justify-between gap-2">
                   <span className="truncate">
@@ -144,7 +144,7 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
             <h3 className="font-semibold">Equipos</h3>
             <Link
               href={`/room/${room.code}/plantillas`}
-              className="text-sm font-semibold text-emerald-500 hover:text-emerald-400"
+              className="text-sm font-semibold text-brand hover:text-brand-light"
             >
               Ver plantillas →
             </Link>

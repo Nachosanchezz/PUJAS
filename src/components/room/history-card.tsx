@@ -2,10 +2,10 @@ import { formatMillions, formatTime, formatTimeWithSeconds } from "@/lib/format"
 import type { HistoryEntry } from "@/lib/room-data";
 
 const BADGES = {
-  sold: { label: "Vendido", className: "bg-amber-400/15 text-amber-400" },
+  sold: { label: "Vendido", className: "bg-gold/15 text-gold" },
   unsold: { label: "Sin pujas", className: "bg-foreground/10 text-foreground/60" },
-  cancelled: { label: "Cancelada", className: "bg-red-500/10 text-red-500" },
-  undone: { label: "Venta deshecha", className: "bg-red-500/10 text-red-500" },
+  cancelled: { label: "Cancelada", className: "bg-alert/10 text-alert" },
+  undone: { label: "Venta deshecha", className: "bg-alert/10 text-alert" },
 } as const;
 
 // Una subasta cerrada: todas sus pujas en orden y cómo terminó
@@ -39,7 +39,7 @@ export function HistoryCard({ entry }: { entry: HistoryEntry }) {
             return (
               <li
                 key={bid.amount}
-                className={`flex justify-between gap-3 ${winning ? "font-semibold text-amber-400" : "text-foreground/70"}`}
+                className={`flex justify-between gap-3 ${winning ? "font-semibold text-gold" : "text-foreground/70"}`}
               >
                 <span>
                   {bid.teamName} → {formatMillions(bid.amount)}

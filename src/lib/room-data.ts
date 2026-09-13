@@ -113,6 +113,8 @@ export type AuctionView = {
   recentBids: { teamName: string; amount: number }[];
   endsAt: string | null;
   pausedRemainingMs: number | null;
+  // Duración de cada subasta en la sala: el anillo del contador se vacía sobre ella
+  durationMs: number;
   // Hora del servidor al generar la página: el contador la usa para
   // corregir la hora del dispositivo si está mal puesta
   serverNow: string;
@@ -255,7 +257,7 @@ export async function getOpenAuction(roomId: string): Promise<AuctionView | null
   const { data, error } = await supabaseAdmin
     .from("auctions")
     .select(
-      "id, status, starting_price, current_price, leading_team_id, ends_at, paused_remaining_ms, player:players(name, position), leading_team:teams(name), bids(amount, team:teams(name))",
+      "id, status, starting_price, current_price, leading_team_id, ends_at, paused_remaining_ms, room:rooms(auction_seconds), player:players(name, position), leading_team:teams(name), bids(amount, team:teams(name))",
     )
     .eq("room_id", roomId)
     .in("status", ["running", "paused"])
@@ -278,6 +280,7 @@ export async function getOpenAuction(roomId: string): Promise<AuctionView | null
     recentBids: data.bids.map((bid) => ({ teamName: bid.team?.name ?? "", amount: bid.amount })),
     endsAt: data.ends_at,
     pausedRemainingMs: data.paused_remaining_ms,
+    durationMs: (data.room?.auction_seconds ?? 15) * 1000,
     serverNow: new Date().toISOString(),
   };
 }

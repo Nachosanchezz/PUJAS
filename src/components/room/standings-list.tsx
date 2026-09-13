@@ -13,7 +13,7 @@ export function StandingsList({ teams, highlightTeamId }: StandingsListProps) {
         <li
           key={team.id}
           className={`flex items-center justify-between gap-3 px-4 py-3 ${
-            team.id === highlightTeamId ? "bg-emerald-500/5" : ""
+            team.id === highlightTeamId ? "bg-brand/5" : ""
           }`}
         >
           <div className="flex flex-col">

@@ -42,8 +42,10 @@ export function BidPanel({ auction, myTeamId, maxBid, slotsLeft }: BidPanelProps
 
       {notice ? (
         <p
-          className={`rounded-xl py-5 text-center text-lg font-bold ${
-            notice === "Vas ganando" ? "bg-emerald-500/15 text-emerald-500" : "bg-foreground/5 text-foreground/70"
+          className={`rounded-2xl py-6 text-center font-display text-3xl font-extrabold italic uppercase ${
+            notice === "Vas ganando"
+              ? "bg-brand/15 text-brand ring-1 ring-brand/40"
+              : "bg-foreground/5 text-foreground/60"
           }`}
         >
           {notice}
@@ -60,10 +62,10 @@ export function BidPanel({ auction, myTeamId, maxBid, slotsLeft }: BidPanelProps
                 value={amount}
                 disabled={pending || amount > maxBid}
                 aria-label={`Pujar ${formatMillions(amount)}`}
-                className="flex flex-col items-center gap-1 rounded-xl bg-emerald-500 py-4 text-black transition-colors hover:bg-emerald-400 active:scale-95 disabled:opacity-30"
+                className="flex flex-col items-center gap-1 rounded-2xl bg-brand py-5 text-black shadow-[0_10px_30px_-12px] shadow-brand transition active:scale-95 hover:bg-brand-light disabled:bg-foreground/10 disabled:text-foreground/30 disabled:shadow-none"
               >
-                <span className="text-2xl font-black">+{increment}</span>
-                <span className="text-xs font-semibold">{formatMillions(amount)}</span>
+                <span className="font-display text-5xl font-black italic leading-none">+{increment}</span>
+                <span className="text-xs font-bold">{formatMillions(amount)}</span>
               </button>
             );
           })}
@@ -75,7 +77,7 @@ export function BidPanel({ auction, myTeamId, maxBid, slotsLeft }: BidPanelProps
       </p>
 
       {state.error && (
-        <p role="alert" className="text-center text-sm font-semibold text-red-500">
+        <p role="alert" className="text-center text-sm font-semibold text-alert">
           {state.error}
         </p>
       )}

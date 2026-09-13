@@ -101,10 +101,15 @@ export function RoomRealtime({ roomId, children }: { roomId: string; children: R
       if (event) {
         setEvents((previous) => {
           const sameAuction = previous.bids.filter((bid) => bid.auctionId === event.auctionId);
-          const bids =
-            event.currentPrice !== null && event.leadingTeamName !== null
-              ? [...sameAuction, { auctionId: event.auctionId, teamName: event.leadingTeamName, amount: event.currentPrice }]
-              : sameAuction;
+          // No todos los avisos son pujas: una pausa o un cambio de tiempo repite el
+          // mismo precio. Solo añadimos la puja si es un importe nuevo.
+          const isNewBid =
+            event.currentPrice !== null &&
+            event.leadingTeamName !== null &&
+            !sameAuction.some((bid) => bid.amount === event.currentPrice);
+          const bids = isNewBid
+            ? [...sameAuction, { auctionId: event.auctionId, teamName: event.leadingTeamName ?? "", amount: event.currentPrice ?? 0 }]
+            : sameAuction;
           return { latest: event, bids: bids.slice(-MAX_EVENT_BIDS) };
         });
       }

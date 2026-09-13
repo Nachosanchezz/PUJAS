@@ -18,7 +18,7 @@ export function JoinForm({ roomCode, teams }: JoinFormProps) {
         {teams.map((team) => (
           <label
             key={team.id}
-            className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-foreground/10 px-4 py-3 transition-colors has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-500/10"
+            className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-foreground/10 px-4 py-3 transition-colors has-[:checked]:border-brand has-[:checked]:bg-brand/10"
           >
             <span className="flex flex-col">
               <span className="font-semibold">{team.name}</span>
@@ -26,7 +26,7 @@ export function JoinForm({ roomCode, teams }: JoinFormProps) {
                 <span className="text-sm text-foreground/60">Presidente: {team.captain}</span>
               )}
             </span>
-            <input type="radio" name="teamId" value={team.id} required className="size-5 accent-emerald-500" />
+            <input type="radio" name="teamId" value={team.id} required className="size-5 accent-brand" />
           </label>
         ))}
       </fieldset>

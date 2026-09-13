@@ -20,7 +20,7 @@ export function RoomNav({ code, current }: { code: string; current: Section }) {
             href={`/room/${code}${link.path}`}
             aria-current={active ? "page" : undefined}
             className={`rounded-full px-3 py-1 text-sm font-semibold transition-colors ${
-              active ? "bg-emerald-500 text-black" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
+              active ? "bg-brand text-black" : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
             }`}
           >
             {link.label}

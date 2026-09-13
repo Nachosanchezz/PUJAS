@@ -73,7 +73,7 @@ export function PlayerImport({ roomId, existingNames, action }: PlayerImportProp
           onChange={(event) => setText(event.target.value)}
           rows={8}
           placeholder={PLACEHOLDER}
-          className="rounded-lg border border-foreground/15 bg-transparent px-3 py-2 text-base outline-none transition-colors focus:border-emerald-500"
+          className="rounded-lg border border-foreground/15 bg-transparent px-3 py-2 text-base outline-none transition-colors focus:border-brand"
         />
       </label>
 
@@ -101,29 +101,29 @@ export function PlayerImport({ roomId, existingNames, action }: PlayerImportProp
             </ul>
           )}
           {preview.alreadyInRoom.length > 0 && (
-            <p className="text-amber-500">
+            <p className="text-gold">
               Ya están en la sala, se omitirán:{" "}
               {preview.alreadyInRoom.map((player) => player.name).join(", ")}
             </p>
           )}
           {preview.duplicates.length > 0 && (
-            <p className="text-amber-500">
+            <p className="text-gold">
               Repetidos en la lista, se importan una sola vez: {preview.duplicates.join(", ")}
             </p>
           )}
           {preview.invalid.length > 0 && (
-            <p className="text-red-500">Líneas no válidas, se ignoran: {preview.invalid.join(" · ")}</p>
+            <p className="text-alert">Líneas no válidas, se ignoran: {preview.invalid.join(" · ")}</p>
           )}
         </div>
       )}
 
       {state.error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-sm text-alert">
           {state.error}
         </p>
       )}
       {state.message && (
-        <p role="status" className="text-sm text-emerald-500">
+        <p role="status" className="text-sm text-brand">
           {state.message}
         </p>
       )}
@@ -131,7 +131,7 @@ export function PlayerImport({ roomId, existingNames, action }: PlayerImportProp
       <button
         type="submit"
         disabled={pending || preview.fresh.length === 0}
-        className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-black transition-colors hover:bg-emerald-400 disabled:opacity-50"
+        className="rounded-lg bg-brand px-4 py-2 font-semibold text-black transition-colors hover:bg-brand-light disabled:opacity-50"
       >
         {pending ? "Importando…" : `Importar ${preview.fresh.length} jugadores`}
       </button>

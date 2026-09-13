@@ -43,7 +43,7 @@ export default async function StatusPage() {
 
       <p
         className={`rounded-lg px-4 py-3 font-semibold ${
-          allOk ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+          allOk ? "bg-brand/10 text-brand" : "bg-alert/10 text-alert"
         }`}
       >
         {allOk ? "Conectado a Supabase" : "Hay problemas con la base de datos"}
@@ -57,7 +57,7 @@ export default async function StatusPage() {
           >
             <div className="flex items-center justify-between">
               <span className="font-mono">{check.table}</span>
-              <span className={check.ok ? "text-emerald-500" : "text-red-500"}>
+              <span className={check.ok ? "text-brand" : "text-alert"}>
                 {check.ok ? "OK" : "Error"}
               </span>
             </div>

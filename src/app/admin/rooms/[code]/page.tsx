@@ -80,7 +80,7 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
         </p>
       </div>
 
-      <div className="flex flex-col gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+      <div className="flex flex-col gap-2 rounded-xl border border-brand/30 bg-brand/5 p-4">
         <span className="text-sm text-foreground/70">Enlace para los presidentes</span>
         <div className="flex items-center justify-between gap-3">
           <span className="truncate font-mono text-sm">{roomUrl}</span>
@@ -93,7 +93,7 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
 
       <Link
         href={`/admin/rooms/${room.code}/live`}
-        className="flex items-center justify-between rounded-xl bg-emerald-500 px-4 py-3 font-semibold text-black transition-colors hover:bg-emerald-400"
+        className="flex items-center justify-between rounded-xl bg-brand px-4 py-3 font-semibold text-black transition-colors hover:bg-brand-light"
       >
         Abrir sala de control
         <span aria-hidden>→</span>
@@ -137,7 +137,7 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
                   </div>
                   <div>
                     <dt className="text-foreground/60">Puja máxima</dt>
-                    <dd className="font-semibold text-emerald-500">
+                    <dd className="font-semibold text-brand">
                       {formatMillions(team.max_bid ?? 0)}
                     </dd>
                   </div>
@@ -216,7 +216,7 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
                       <input type="hidden" name="playerId" value={player.id} />
                       <button
                         type="submit"
-                        className="text-red-500 hover:text-red-400"
+                        className="text-alert hover:text-alert-light"
                         aria-label={`Eliminar a ${player.name}`}
                       >
                         Eliminar

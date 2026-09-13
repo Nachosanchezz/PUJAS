@@ -4,9 +4,9 @@ import { startTransition, useActionState, type FormEvent } from "react";
 import type { FormState } from "@/components/action-form";
 
 const VARIANTS = {
-  primary: "bg-emerald-500 text-black hover:bg-emerald-400",
+  primary: "bg-brand text-black hover:bg-brand-light",
   secondary: "border border-foreground/20 hover:bg-foreground/10",
-  danger: "border border-red-500/40 text-red-500 hover:bg-red-500/10",
+  danger: "border border-alert/40 text-alert hover:bg-alert/10",
 } as const;
 
 type ActionButtonProps = {
@@ -51,7 +51,7 @@ export function ActionButton({
         {pending ? "…" : label}
       </button>
       {state.error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-sm text-alert">
           {state.error}
         </p>
       )}

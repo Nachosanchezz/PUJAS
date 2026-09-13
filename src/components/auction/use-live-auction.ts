@@ -14,14 +14,14 @@ export function useLiveAuction(auction: AuctionView): AuctionView {
   if (!event || event.auctionId !== auction.id) return auction;
   if (Date.parse(event.serverNow) <= Date.parse(auction.serverNow)) return auction;
 
-  // Últimas pujas: las que trajo el servidor + las que han llegado por aviso
-  const known = new Set(auction.recentBids.map((bid) => bid.amount));
-  const fromEvents = bids
-    .filter((bid) => bid.auctionId === auction.id && !known.has(bid.amount))
-    .map(({ teamName, amount }) => ({ teamName, amount }));
-  const recentBids = [...fromEvents, ...auction.recentBids]
-    .sort((a, b) => b.amount - a.amount)
-    .slice(0, RECENT_BIDS);
+  // Últimas pujas: las que trajo el servidor + las que han llegado por aviso.
+  // Cada importe es único en una subasta, así que lo usamos para no repetir ninguna.
+  const byAmount = new Map<number, { teamName: string; amount: number }>();
+  for (const bid of bids) {
+    if (bid.auctionId === auction.id) byAmount.set(bid.amount, { teamName: bid.teamName, amount: bid.amount });
+  }
+  for (const bid of auction.recentBids) byAmount.set(bid.amount, bid);
+  const recentBids = [...byAmount.values()].sort((a, b) => b.amount - a.amount).slice(0, RECENT_BIDS);
 
   return {
     ...auction,

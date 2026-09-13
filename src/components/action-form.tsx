@@ -40,14 +40,14 @@ export function ActionForm({ action, submitLabel, children }: ActionFormProps) {
     <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-3">
       {children}
       {state.error && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="text-sm text-alert">
           {state.error}
         </p>
       )}
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-emerald-500 px-4 py-2 font-semibold text-black transition-colors hover:bg-emerald-400 disabled:opacity-50"
+        className="rounded-lg bg-brand px-4 py-2 font-semibold text-black transition-colors hover:bg-brand-light disabled:opacity-50"
       >
         {pending ? "Guardando…" : submitLabel}
       </button>
