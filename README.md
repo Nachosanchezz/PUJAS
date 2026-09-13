@@ -54,6 +54,7 @@ npm run db:types   # regenera src/types/database.ts a partir del esquema
 
 ## Despliegue (Vercel)
 
+- Web publicada: **https://pujas-7j22.vercel.app**
 - El proyecto se publica en Vercel desde GitHub: **cada push a `main` se despliega solo**.
 - `vercel.json` fija la región `fra1` (Frankfurt), la misma que la base de datos de Supabase, para que cada consulta no cruce el Atlántico.
 - Variables de entorno necesarias en Vercel (las mismas que en `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `ADMIN_PASSWORD` y `SESSION_SECRET`.
