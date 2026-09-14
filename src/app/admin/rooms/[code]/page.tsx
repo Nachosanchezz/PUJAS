@@ -9,6 +9,7 @@ import {
   importPlayers,
   regenerateTeamPin,
   updateRoomRules,
+  updateTeamBudget,
   drawAuctionOrder,
 } from "@/app/admin/actions";
 import { ActionButton } from "@/components/action-button";
@@ -72,6 +73,11 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
   );
   const auctionPlayers = players.data.filter((player) => !player.is_captain);
   const canAddTeams = room.status === "setup" && teams.length < room.max_teams;
+  // Equipos con un presupuesto distinto al de la sala (dinero extra para equilibrar)
+  const budgetExceptions = teams
+    .filter((team) => team.initial_budget !== room.initial_budget)
+    .map((team) => ` · ${team.name}: ${formatMillions(team.initial_budget ?? 0)}`)
+    .join("");
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-6 py-12">
@@ -80,6 +86,7 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
         <p className="text-sm text-foreground/60">
           Código <span className="font-mono font-semibold text-foreground">{room.code}</span> ·{" "}
           {ROOM_STATUS_LABEL[room.status]} · {formatMillions(room.initial_budget)} por equipo
+          {budgetExceptions}
         </p>
       </div>
 
@@ -207,6 +214,23 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
                     </dd>
                   </div>
                 </dl>
+                {room.status === "setup" && (
+                  <ActionForm action={updateTeamBudget} submitLabel="Guardar presupuesto">
+                    <input type="hidden" name="teamId" value={team.team_id ?? ""} />
+                    <TextField
+                      // key: al guardar, el campo vuelve a mostrar el valor ya guardado
+                      key={team.initial_budget}
+                      label="Presupuesto inicial (M€)"
+                      name="budget"
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      max={10000}
+                      defaultValue={team.initial_budget ?? room.initial_budget}
+                      required
+                    />
+                  </ActionForm>
+                )}
                 <div className="flex items-center justify-between gap-2 border-t border-foreground/10 pt-3 text-sm">
                   <span className="text-foreground/60">
                     PIN{" "}

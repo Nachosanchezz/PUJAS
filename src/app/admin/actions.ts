@@ -197,6 +197,46 @@ export async function regenerateTeamPin(formData: FormData): Promise<void> {
   revalidatePath(ROOM_PAGE, "page");
 }
 
+const teamBudgetSchema = z.object({
+  teamId: z.uuid(),
+  budget: z.coerce
+    .number()
+    .int("El presupuesto debe ser un número entero")
+    .min(1, "El presupuesto mínimo es 1 M€")
+    .max(10000, "El presupuesto máximo es 10.000 M€"),
+});
+
+// Presupuesto inicial de un equipo (p. ej. dinero extra para equilibrar).
+// Solo antes de empezar: con la subasta en marcha cambiaría las reglas a mitad.
+export async function updateTeamBudget(_state: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const parsed = teamBudgetSchema.safeParse({
+    teamId: formData.get("teamId"),
+    budget: formData.get("budget"),
+  });
+  if (!parsed.success) return { error: firstIssue(parsed.error) };
+
+  const { data: team, error: teamError } = await supabaseAdmin
+    .from("teams")
+    .select("room:rooms(status)")
+    .eq("id", parsed.data.teamId)
+    .maybeSingle();
+  if (teamError || !team) return { error: "No se encontró el equipo" };
+  if (team.room?.status !== "setup") {
+    return { error: "El presupuesto solo se puede cambiar antes de empezar la subasta" };
+  }
+
+  const { error } = await supabaseAdmin
+    .from("teams")
+    .update({ initial_budget: parsed.data.budget })
+    .eq("id", parsed.data.teamId);
+  if (error) return { error: "No se pudo guardar el presupuesto" };
+
+  revalidatePath(ROOM_PAGE, "page");
+  return { error: null };
+}
+
 // ---------- Jugadores ----------
 
 const playerSchema = z.object({

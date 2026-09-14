@@ -34,7 +34,7 @@
 
 7. Cada presidente **abre el enlace** en su móvil: https://pujas-7j22.vercel.app/room/ER7PAP. También puede entrar en la portada y escribir el código `ER7PAP`.
 8. **Elige su equipo**, escribe **su PIN** y pulsa **Entrar como presidente**.
-9. Verá **"Tu equipo"** con 1/8 jugadores, **200 M€** y una puja máxima de **194 M€**. Ya está dentro. Si recarga o cierra el navegador, sigue dentro.
+9. Verá **"Tu equipo"** con 1/8 jugadores, **200 M€** y una puja máxima de **194 M€** (Lui: **230 M€** y **224 M€**). Ya está dentro. Si recarga o cierra el navegador, sigue dentro.
 
 **Si algo falla al entrar:**
 - *"PIN incorrecto"*: revisa el PIN en el panel del admin.
@@ -64,7 +64,7 @@
 
 | Regla | Detalle |
 |---|---|
-| Presupuesto | 200 M€ por equipo |
+| Presupuesto | 200 M€ por equipo; **Lui, 230 M€** (30 M€ extra para equilibrar). Se cambia en la tarjeta de cada equipo, solo antes de empezar |
 | Precio de salida | 1 M€ |
 | Plantillas | Todos los equipos acaban con **8** jugadores (presidente incluido): cada presidente ficha a 7 |
 | Puja máxima | Lo que te queda − 1 M€ por cada plaza que te falte cubrir después de esta. Así nunca te quedas sin dinero para completar la plantilla |
