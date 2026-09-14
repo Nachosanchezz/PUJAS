@@ -46,7 +46,7 @@
 
 ## 4. La subasta
 
-10. **El admin elige un jugador** en *Jugadores disponibles* y pulsa **Sacar a subasta**. En todas las pantallas aparece el jugador, el contador de **15 segundos** y el **precio de salida (1 M€)**.
+10. **El admin pulsa "Sacar al siguiente"**: los jugadores salen en el **orden sorteado**, que todos ven en la pestaña **Orden** de la sala. En todas las pantallas aparece el jugador, el contador de **15 segundos** y el **precio de salida (1 M€)**.
 11. **Los presidentes pujan** con **+1**, **+5** o **+10**.
     - Cada botón muestra la **cantidad total** que vas a pujar. Por ejemplo, con la puja en 10 M€, el botón +5 pone **15 M€**.
     - La primera puja parte de 0: **+5 son 5 M€**.
@@ -57,7 +57,7 @@
 12. **Cada puja vuelve a poner el contador a 15 segundos.** Así nadie gana pujando en el último instante: siempre hay tiempo para responder.
 13. **Al llegar a 0:**
     - **Si alguien ha pujado:** sale **VENDIDO** en todas las pantallas. El jugador pasa a la plantilla del ganador y se le descuenta el dinero.
-    - **Si nadie ha pujado:** sale **"Sin pujas"** y el jugador vuelve a la lista. El admin puede sacarlo otra vez más tarde.
+    - **Si nadie ha pujado:** sale **"Sin pujas"** y el jugador vuelve a la lista, **al final del orden**.
 14. **El admin saca al siguiente jugador** y se repite hasta vender los 35.
 
 ### Reglas que conviene recordar

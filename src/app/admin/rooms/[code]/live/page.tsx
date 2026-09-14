@@ -24,7 +24,7 @@ import { TextField } from "@/components/ui/text-field";
 import { requireAdmin } from "@/lib/admin-auth";
 import { formatMillions } from "@/lib/format";
 import { ROOM_STATUS_LABEL } from "@/lib/labels";
-import { getLastResult, getOpenAuction, getTeamSummaries } from "@/lib/room-data";
+import { getDrawOrder, getLastResult, getOpenAuction, getTeamSummaries } from "@/lib/room-data";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export const metadata: Metadata = {
@@ -44,16 +44,11 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
   if (error) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const [auction, lastResult, teams, available, sold] = await Promise.all([
+  const [auction, lastResult, teams, order, sold] = await Promise.all([
     getOpenAuction(room.id),
     getLastResult(room.id),
     getTeamSummaries(room.id),
-    supabaseAdmin
-      .from("players")
-      .select("id, name, position")
-      .eq("room_id", room.id)
-      .eq("status", "available")
-      .order("name"),
+    getDrawOrder(room.id),
     supabaseAdmin
       .from("players")
       .select("id, name, sold_price, team:teams(name)")
@@ -63,7 +58,14 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
       .order("sold_at", { ascending: false }),
   ]);
 
-  if (available.error || sold.error) throw new Error("No se pudieron cargar los jugadores");
+  if (sold.error) throw new Error("No se pudieron cargar los jugadores");
+
+  // Disponibles en el orden del sorteo; los que salieron sin pujas van al final
+  const available = [
+    ...order.entries.filter((player) => player.status === "available" && !player.unsold),
+    ...order.entries.filter((player) => player.status === "available" && player.unsold),
+  ];
+  const next = available[0] ?? null;
 
   return (
     <RoomRealtime roomId={room.id}>
@@ -87,6 +89,13 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
               className="text-brand hover:text-brand-light"
             >
               Historial ↗
+            </Link>
+            <Link
+              href={`/room/${room.code}/orden`}
+              target="_blank"
+              className="text-brand hover:text-brand-light"
+            >
+              Orden ↗
             </Link>
           </div>
         </div>
@@ -128,30 +137,53 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
             <p className="rounded-xl border border-foreground/10 p-4 text-center text-foreground/70">
               {room.status === "finished"
                 ? "¡Subasta terminada! Todos los jugadores tienen equipo."
-                : "No hay ningún jugador en subasta. Elige el siguiente de la lista."}
+                : "No hay ningún jugador en subasta."}
             </p>
+            {next && (
+              <div className="flex flex-col items-center gap-2">
+                <span className="text-sm text-foreground/60">
+                  Siguiente según el orden de salida{next.order ? ` (nº ${next.order})` : ""}
+                </span>
+                <ActionButton
+                  action={startAuction}
+                  fields={{ roomId: room.id, playerId: next.id }}
+                  label={`Sacar al siguiente: ${next.name}`}
+                />
+              </div>
+            )}
           </div>
         )}
 
         <section className="flex flex-col gap-4">
-          <SectionTitle title="Jugadores disponibles" count={String(available.data.length)} />
-          {available.data.length === 0 ? (
+          <SectionTitle title="Jugadores disponibles" count={String(available.length)} />
+          {available.length === 0 ? (
             <p className="text-foreground/60">No quedan jugadores disponibles.</p>
           ) : (
             <ul className="divide-y divide-foreground/10 rounded-xl border border-foreground/10">
-              {available.data.map((player) => (
-                <li key={player.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                  <div className="flex flex-col">
-                    <span className="font-medium">{player.name}</span>
-                    {player.position && (
-                      <span className="text-sm text-foreground/60">{player.position}</span>
-                    )}
+              {available.map((player, index) => (
+                <li
+                  key={player.id}
+                  className={`flex items-center justify-between gap-3 px-4 py-3 ${index === 0 ? "bg-brand/5" : ""}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 shrink-0 text-right font-display text-xl font-extrabold italic text-foreground/40">
+                      {player.order ?? "–"}
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium">{player.name}</span>
+                      {(player.position || player.unsold) && (
+                        <span className="text-sm text-foreground/60">
+                          {[player.position, player.unsold ? "salió sin pujas" : null].filter(Boolean).join(" · ")}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   {!auction && (
                     <ActionButton
                       action={startAuction}
                       fields={{ roomId: room.id, playerId: player.id }}
                       label="Sacar a subasta"
+                      variant={index === 0 ? "primary" : "secondary"}
                     />
                   )}
                 </li>
@@ -192,7 +224,7 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
           )}
         </section>
 
-        {available.data.length > 0 && (
+        {available.length > 0 && (
           <section className="flex flex-col gap-4">
             <SectionTitle title="Adjudicar a mano" />
             <p className="text-sm text-foreground/60">
@@ -205,7 +237,7 @@ export default async function LiveControlPage({ params }: PageProps<"/admin/room
                   name="playerId"
                   required
                   placeholder="Elige jugador"
-                  options={available.data.map((player) => ({ value: player.id, label: player.name }))}
+                  options={available.map((player) => ({ value: player.id, label: player.name }))}
                 />
                 <SelectField
                   label="Equipo"

@@ -123,6 +123,22 @@ export async function updateRoomRules(_state: FormState, formData: FormData): Pr
   return { error: null };
 }
 
+// Sorteo del orden de salida: una sola vez y antes de empezar
+export async function drawAuctionOrder(_state: FormState, formData: FormData): Promise<FormState> {
+  await requireAdmin();
+
+  const parsed = z.uuid().safeParse(formData.get("roomId"));
+  if (!parsed.success) return { error: "Datos no válidos" };
+
+  const { error } = await supabaseAdmin.rpc("draw_auction_order", { p_room_id: parsed.data });
+  if (error) {
+    return { error: error.code === RAISED_EXCEPTION ? error.message : "No se pudo sortear el orden" };
+  }
+
+  revalidatePath(ROOM_PAGE, "page");
+  return { error: null };
+}
+
 // ---------- Equipos ----------
 
 const teamSchema = z.object({

@@ -134,6 +134,7 @@ export type Database = {
       players: {
         Row: {
           created_at: string
+          draw_order: number | null
           id: string
           is_captain: boolean
           name: string
@@ -147,6 +148,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          draw_order?: number | null
           id?: string
           is_captain?: boolean
           name: string
@@ -160,6 +162,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          draw_order?: number | null
           id?: string
           is_captain?: boolean
           name?: string
@@ -206,6 +209,7 @@ export type Database = {
           max_teams: number
           min_price: number
           name: string
+          order_drawn_at: string | null
           squad_size_max: number
           squad_size_min: number
           status: Database["public"]["Enums"]["room_status"]
@@ -221,6 +225,7 @@ export type Database = {
           max_teams?: number
           min_price?: number
           name: string
+          order_drawn_at?: string | null
           squad_size_max?: number
           squad_size_min?: number
           status?: Database["public"]["Enums"]["room_status"]
@@ -236,6 +241,7 @@ export type Database = {
           max_teams?: number
           min_price?: number
           name?: string
+          order_drawn_at?: string | null
           squad_size_max?: number
           squad_size_min?: number
           status?: Database["public"]["Enums"]["room_status"]
@@ -356,6 +362,7 @@ export type Database = {
         }
         Returns: string
       }
+      draw_auction_order: { Args: { p_room_id: string }; Returns: undefined }
       pause_auction: { Args: { p_auction_id: string }; Returns: undefined }
       place_bid: {
         Args: { p_amount: number; p_auction_id: string; p_team_id: string }

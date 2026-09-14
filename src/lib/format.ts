@@ -26,3 +26,16 @@ export function formatTime(isoDate: string): string {
 export function formatTimeWithSeconds(isoDate: string): string {
   return timeWithSecondsFormat.format(new Date(isoDate));
 }
+
+const dateTimeFormat = new Intl.DateTimeFormat("es-ES", {
+  timeZone: TIME_ZONE,
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+// "14 de septiembre, 18:32"
+export function formatDateTime(isoDate: string): string {
+  return dateTimeFormat.format(new Date(isoDate));
+}

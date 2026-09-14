@@ -122,6 +122,52 @@ export type AuctionView = {
   serverNow: string;
 };
 
+export type OrderEntry = {
+  id: string;
+  order: number | null;
+  name: string;
+  position: string | null;
+  status: Enums<"player_status">;
+  teamName: string | null;
+  price: number | null;
+  // Salió a subasta y nadie pujó: vuelve a la lista, pero al final
+  unsold: boolean;
+};
+
+export type DrawOrder = { drawnAt: string | null; entries: OrderEntry[] };
+
+// Orden de salida de la subasta: el del sorteo (sin sorteo, alfabético)
+export async function getDrawOrder(roomId: string): Promise<DrawOrder> {
+  const [room, players, unsold] = await Promise.all([
+    supabaseAdmin.from("rooms").select("order_drawn_at").eq("id", roomId).single(),
+    supabaseAdmin
+      .from("players")
+      .select("id, name, position, status, draw_order, sold_price, team:teams(name)")
+      .eq("room_id", roomId)
+      .eq("is_captain", false)
+      .order("draw_order", { ascending: true, nullsFirst: false })
+      .order("name"),
+    supabaseAdmin.from("auctions").select("player_id").eq("room_id", roomId).eq("status", "unsold"),
+  ]);
+
+  if (room.error || players.error || unsold.error) throw new Error("No se pudo cargar el orden de salida");
+
+  const unsoldIds = new Set(unsold.data.map((auction) => auction.player_id));
+  return {
+    drawnAt: room.data.order_drawn_at,
+    entries: players.data.map((player) => ({
+      id: player.id,
+      order: player.draw_order,
+      name: player.name,
+      position: player.position,
+      status: player.status,
+      teamName: player.team?.name ?? null,
+      price: player.sold_price,
+      unsold: player.status === "available" && unsoldIds.has(player.id),
+    })),
+  };
+}
+
 export type HistoryBid = { teamName: string; amount: number; at: string };
 
 export type HistoryEntry = {

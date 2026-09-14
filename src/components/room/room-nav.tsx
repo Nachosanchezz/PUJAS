@@ -1,9 +1,10 @@
 import Link from "next/link";
 
-type Section = "sala" | "plantillas" | "historial";
+type Section = "sala" | "orden" | "plantillas" | "historial";
 
 const LINKS: { section: Section; label: string; path: string }[] = [
   { section: "sala", label: "Sala", path: "" },
+  { section: "orden", label: "Orden", path: "/orden" },
   { section: "plantillas", label: "Plantillas", path: "/plantillas" },
   { section: "historial", label: "Historial", path: "/historial" },
 ];

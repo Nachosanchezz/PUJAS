@@ -9,7 +9,9 @@ import {
   importPlayers,
   regenerateTeamPin,
   updateRoomRules,
+  drawAuctionOrder,
 } from "@/app/admin/actions";
+import { ActionButton } from "@/components/action-button";
 import { ActionForm } from "@/components/action-form";
 import { AdminHeader } from "@/components/admin/admin-header";
 import { PlayerImport } from "@/components/admin/player-import";
@@ -17,7 +19,7 @@ import { CopyButton } from "@/components/ui/copy-button";
 import { SectionTitle } from "@/components/ui/section-title";
 import { TextField } from "@/components/ui/text-field";
 import { requireAdmin } from "@/lib/admin-auth";
-import { formatMillions } from "@/lib/format";
+import { formatDateTime, formatMillions } from "@/lib/format";
 import { PLAYER_STATUS_LABEL, ROOM_STATUS_LABEL } from "@/lib/labels";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
@@ -131,6 +133,35 @@ export default async function AdminRoomPage({ params }: PageProps<"/admin/rooms/
             siguiente jugador que salga; el reinicio, desde la siguiente puja.
           </p>
         </ActionForm>
+      </section>
+
+      <section aria-label="Orden de salida" className="flex flex-col gap-3">
+        <SectionTitle title="Orden de salida" />
+        {room.order_drawn_at ? (
+          <p className="text-sm text-foreground/70">
+            Sorteado el <strong className="text-foreground">{formatDateTime(room.order_drawn_at)}</strong>.{" "}
+            <Link
+              href={`/room/${room.code}/orden`}
+              target="_blank"
+              className="font-semibold text-brand hover:text-brand-light"
+            >
+              Ver el orden ↗
+            </Link>
+          </p>
+        ) : (
+          <div className="flex flex-col items-start gap-3">
+            <p className="text-sm text-foreground/60">
+              Mezcla al azar el orden en que saldrán los jugadores. Solo se puede hacer una vez y
+              antes de empezar; todos lo verán en la pestaña «Orden».
+            </p>
+            <ActionButton
+              action={drawAuctionOrder}
+              fields={{ roomId: room.id }}
+              label="Sortear orden de salida"
+              confirmMessage="¿Sortear ya el orden de salida? No se puede repetir."
+            />
+          </div>
+        )}
       </section>
 
       <section className="flex flex-col gap-4">
