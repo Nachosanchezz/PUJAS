@@ -5,6 +5,7 @@ import { RoomNav } from "@/components/room/room-nav";
 import { CopyButton } from "@/components/ui/copy-button";
 import { formatDateTime, formatMillions } from "@/lib/format";
 import { buildOrderText } from "@/lib/order-text";
+import { getPresidentSession } from "@/lib/president-auth";
 import { getDrawOrder } from "@/lib/room-data";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
@@ -25,17 +26,20 @@ export default async function OrderPage({ params }: PageProps<"/room/[code]/orde
   if (error) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const { drawnAt, entries } = await getDrawOrder(room.id);
+  const [{ drawnAt, entries }, session] = await Promise.all([
+    getDrawOrder(room.id),
+    getPresidentSession(room.id),
+  ]);
   // El siguiente: el primero disponible que aún no ha salido; los que salieron sin pujas, al final
   const next =
     entries.find((entry) => entry.status === "available" && !entry.unsold) ??
     entries.find((entry) => entry.status === "available");
 
   return (
-    <RoomRealtime roomId={room.id}>
+    <RoomRealtime roomId={room.id} live={Boolean(session)}>
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-6 py-12">
         <div className="flex flex-col gap-3">
-          <RoomNav code={room.code} current="orden" />
+          <RoomNav code={room.code} current="orden" president={Boolean(session)} />
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="flex flex-col gap-1">
               <h1 className="text-3xl tracking-tight">Orden de salida</h1>

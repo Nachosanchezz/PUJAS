@@ -7,6 +7,7 @@
 | **Admin** | Un ordenador, la contraseña de admin y la sala de control abierta |
 | **Cada presidente** | Su móvil (con Wi-Fi o datos), el enlace de la sala y el PIN de su equipo |
 | **Pantalla grande** (opcional) | Una tele o proyector con la página de plantillas |
+| **El resto de la liga** (opcional) | El enlace de directo: ven la subasta sin PIN, pero no pueden pujar |
 
 ---
 
@@ -21,6 +22,15 @@
    > Mañana es la subasta 🔨 Entra aquí: https://pujas-7j22.vercel.app/room/ER7PAP
    > Tu equipo es **Nacho** y tu PIN es **1234**. No se lo pases a nadie.
 3. **Si alguien filtra su PIN**, pulsa *Nuevo PIN* en su tarjeta. El anterior deja de valer y quien estuviera dentro con él queda fuera.
+
+### Para que el resto de la liga la vea en directo
+
+Manda al grupo de WhatsApp el enlace de **directo**. No hace falta PIN y no se puede pujar: se ve el jugador que está en subasta, el contador, las pujas y lo que le queda a cada equipo. Por ejemplo:
+
+> La subasta, en directo 🔨 https://pujas-7j22.vercel.app/room/ER7PAP/directo
+> Solo pujan los presidentes: vosotros podéis mirar cuánto pujan por vosotros 👀
+
+Las pantallas de los espectadores se actualizan cada 3 segundos (las de los presidentes, al instante). Es a propósito: así, aunque mire toda la liga, no se satura el tiempo real del que dependen las pujas. En **Orden** ven cuándo les toca salir.
 
 ## 2. El día, 15 minutos antes
 

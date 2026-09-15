@@ -7,6 +7,8 @@ import type { Enums } from "@/types/database";
 
 // Red de seguridad: si el canal en tiempo real falla, refrescamos cada 3 s
 const FALLBACK_POLL_MS = 3000;
+// Quien entra solo a mirar se pone al día cada 3 s (ver RoomRealtime)
+const SPECTATOR_POLL_MS = 3000;
 const MAX_EVENT_BIDS = 20;
 
 // Estado de la subasta que viaja dentro del aviso en tiempo real
@@ -76,12 +78,38 @@ function needsReload(event: AuctionEvent | null): boolean {
 
 // Escucha los avisos de la sala (Supabase Realtime) y los comparte con los
 // componentes de la subasta, que los pintan al instante.
-export function RoomRealtime({ roomId, children }: { roomId: string; children: ReactNode }) {
+//
+// Con live={false} (quien entra sin PIN, solo a mirar) no se conecta al canal:
+// cada aviso cuenta como un mensaje por pantalla conectada y, con media liga
+// mirando, las pujas rápidas pasarían del límite de Supabase (100 por segundo
+// en el plan gratuito), que desconecta a todos, presidentes incluidos. En su
+// lugar pide la página cada pocos segundos mientras la pantalla está visible.
+export function RoomRealtime({
+  roomId,
+  live = true,
+  children,
+}: {
+  roomId: string;
+  live?: boolean;
+  children: ReactNode;
+}) {
   const router = useRouter();
-  const [status, setStatus] = useState("connecting");
+  const [status, setStatus] = useState(live ? "connecting" : "polling");
   const [events, setEvents] = useState<RoomEvents>({ latest: null, bids: [] });
 
   useEffect(() => {
+    if (!live) {
+      const refreshIfVisible = () => {
+        if (document.visibilityState === "visible") router.refresh();
+      };
+      const poll = setInterval(refreshIfVisible, SPECTATOR_POLL_MS);
+      document.addEventListener("visibilitychange", refreshIfVisible);
+      return () => {
+        clearInterval(poll);
+        document.removeEventListener("visibilitychange", refreshIfVisible);
+      };
+    }
+
     let active = true;
     let pending: ReturnType<typeof setTimeout> | undefined;
     let poll: ReturnType<typeof setInterval> | undefined;
@@ -149,7 +177,7 @@ export function RoomRealtime({ roomId, children }: { roomId: string; children: R
       document.removeEventListener("visibilitychange", onVisible);
       supabase.removeChannel(channel);
     };
-  }, [roomId, router]);
+  }, [roomId, live, router]);
 
   return (
     <RoomEventsContext value={events}>

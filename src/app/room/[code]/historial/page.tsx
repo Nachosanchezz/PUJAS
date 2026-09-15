@@ -4,6 +4,7 @@ import { RoomRealtime } from "@/components/realtime/room-realtime";
 import { HistoryCard } from "@/components/room/history-card";
 import { RoomNav } from "@/components/room/room-nav";
 import { formatMillions, formatTime } from "@/lib/format";
+import { getPresidentSession } from "@/lib/president-auth";
 import { getHistory } from "@/lib/room-data";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
@@ -24,7 +25,10 @@ export default async function HistoryPage({ params }: PageProps<"/room/[code]/hi
   if (error) throw new Error("No se pudo cargar la sala");
   if (!room) notFound();
 
-  const { entries, manualSales } = await getHistory(room.id);
+  const [{ entries, manualSales }, session] = await Promise.all([
+    getHistory(room.id),
+    getPresidentSession(room.id),
+  ]);
 
   const totalBids = entries.reduce((sum, entry) => sum + entry.bids.length, 0);
   const mostContested = entries.reduce<(typeof entries)[number] | null>(
@@ -33,10 +37,10 @@ export default async function HistoryPage({ params }: PageProps<"/room/[code]/hi
   );
 
   return (
-    <RoomRealtime roomId={room.id}>
+    <RoomRealtime roomId={room.id} live={Boolean(session)}>
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
         <div className="flex flex-col gap-3">
-          <RoomNav code={room.code} current="historial" />
+          <RoomNav code={room.code} current="historial" president={Boolean(session)} />
           <div className="flex flex-col gap-1">
             <h1 className="text-3xl font-bold tracking-tight">Historial</h1>
             <p className="text-sm text-foreground/60">

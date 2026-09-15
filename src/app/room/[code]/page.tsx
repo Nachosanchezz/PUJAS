@@ -47,7 +47,7 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
 
   const heading = (
     <div className="flex flex-col gap-3">
-      <RoomNav code={room.code} current="sala" />
+      <RoomNav code={room.code} current="sala" president={Boolean(session)} />
       <div className="flex flex-col gap-1">
         <span className="text-xs font-semibold uppercase tracking-widest text-brand">
           Sala {room.code}
@@ -61,6 +61,13 @@ export default async function RoomPage({ params }: PageProps<"/room/[code]">) {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-6 py-12">
         {heading}
+        <Link
+          href={`/room/${room.code}/directo`}
+          className="flex items-center justify-between gap-3 rounded-xl border border-foreground/10 px-4 py-3 text-sm transition-colors hover:border-brand"
+        >
+          <span className="text-foreground/70">¿No eres presidente? Mira la subasta sin pujar</span>
+          <span className="shrink-0 font-semibold text-brand">En directo →</span>
+        </Link>
         {teams.length === 0 ? (
           <p className="text-foreground/70">El administrador todavía no ha creado los equipos.</p>
         ) : (
